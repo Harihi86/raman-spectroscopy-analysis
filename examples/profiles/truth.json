@@ -1,0 +1,48 @@
+{
+  "kind": "synthetic",
+  "seed": 723,
+  "scope": "software fixture, not measurements or instrument calibration",
+  "truth": {
+    "gaussian": {
+      "components": 1,
+      "parameters": [
+        12,
+        80,
+        5
+      ],
+      "parameter_order": [
+        "height",
+        "center_cm1",
+        "sigma_cm1"
+      ]
+    },
+    "lorentzian": {
+      "components": 1,
+      "parameters": [
+        12,
+        80,
+        7
+      ],
+      "parameter_order": [
+        "height",
+        "center_cm1",
+        "gamma_cm1"
+      ]
+    },
+    "voigt": {
+      "components": 1,
+      "parameters": [
+        12,
+        80,
+        5,
+        4
+      ],
+      "parameter_order": [
+        "height",
+        "center_cm1",
+        "sigma_cm1",
+        "gamma_cm1"
+      ]
+    }
+  }
+}

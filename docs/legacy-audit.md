@@ -13,7 +13,7 @@ or to the private profile file where noted.
 | `core_processing.py:489`, `detect_read_mode` | Even-column numeric tables can be classified as alternating X/Y pairs even if they are shared-X tables | New API requires explicit columns and never guesses layout |
 | `core_processing.py:510`, `read_excel_spectra` | Excel-only import with header inference by numeric coercion | Explicit header or headerless CSV/TSV/TXT/XLSX import; units declared |
 | `core_processing.py:572`, `als_baseline` | Index-space penalty; equality can assign zero weight on a flat signal | New AsLS requires uniform spacing, validates parameters and keeps positive equality weights |
-| `core_processing.py:865` and `1045` | Single/double Gaussian routines, positive amplitude and local linear backgrounds | Manual 1..8 Gaussian models or automatic zero-to-N candidate comparison; bounds and ambiguity remain explicit |
+| `core_processing.py:865` and `1045` | Single/double Gaussian routines, positive amplitude and local linear backgrounds | Manual 1..8 Gaussian/Lorentzian/Voigt models or automatic family/count comparison; bounds and ambiguity remain explicit |
 | `core_processing.py:1276`, `fallback_peak_max` | Returns `success=True` for a maximum-based fallback while width/covariance remain NaN | New fit keeps FAIL/INCONCLUSIVE; no maximum fallback |
 | `core_processing.py:2416`, `process_profile` | A pressure must exist for every spectrum, even for ordinary per-spectrum analysis | New API does not require pressure metadata |
 | `core_processing.py:3120`, `_select_stable_segment` | Chooses favorable contiguous pressure segments for comparison | No automatic scientific trend/phase interpretation in public API |

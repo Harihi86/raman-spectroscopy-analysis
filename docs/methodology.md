@@ -12,7 +12,7 @@ parameter depends on sampling density and noise; it is not universally transfera
 between instruments or spectra. A fixed number of iterations is recorded, not
 reported as proof of convergence of every baseline choice.
 
-The fit is a sum of positive Gaussians and an unconstrained linear residual
+The fit is a sum of positive peaks from a declared Gaussian/Lorentzian/Voigt family and an unconstrained linear residual
 background. The intercept uses a centered axis for numerical conditioning. Inputs
 need more points than fit parameters. The default loss is ordinary least squares;
 no robust-loss covariance or noise-distribution guarantee is claimed.
@@ -56,6 +56,12 @@ lambda=1e9 for its uniform synthetic grid. This parameter is not a universal
 recommendation. Its saved truth, residual plots and report expose remaining
 baseline/model bias instead of treating convergence as physical validation.
 
-In manual positive-peak mode, flat or affine spectra within a relative intensity tolerance of 1e-12 do not establish a Gaussian peak: peak covariance is withheld and the result stays INCONCLUSIVE. Automatic mode explicitly includes a zero-peak background and can select it without asserting that a physical mode is absent. See [automatic model comparison](automatic.md).
+In manual positive-peak mode, flat or affine spectra within a relative intensity tolerance of 1e-12 do not establish a positive peak: peak covariance is withheld and the result stays INCONCLUSIVE. Automatic mode explicitly includes a zero-peak background and can select it without asserting that a physical mode is absent. See [automatic model comparison](automatic.md).
 
-An explicit AsLS `resample:true` option estimates only the baseline on a same-length uniform grid for irregular inputs; fitted observations stay on their original axes. The additional baseline uncertainty is not included in the local covariance. When supplied, fitted-sample standard errors are exported as `measurement_sigma` in `fit.csv`.
+An explicit AsLS/arPLS `resample:true` option estimates only the baseline on a same-length uniform grid for irregular inputs; fitted observations stay on their original axes. The additional baseline uncertainty is not included in the local covariance. When supplied, fitted-sample standard errors are exported as `measurement_sigma` in `fit.csv`.
+
+Version 0.4 adds arPLS with explicit convergence diagnostics, exact Voigt and
+Lorentzian profiles, and conservative family/baseline count comparisons.
+[Definitions, parameter penalties and uncertainty boundaries](profiles-and-baselines.md).
+Different baseline-corrected observations are not pooled into a single BIC/AICc
+ranking. Equal best counts with unresolved diagnostics remain agreement only.

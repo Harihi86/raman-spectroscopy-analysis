@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "data_kind": "synthetic",
+  "defaults": {
+    "input": {
+      "sigma": "noise_sd"
+    },
+    "baseline": {
+      "method": "none"
+    },
+    "fit": {
+      "auto": {
+        "shapes": [
+          "gaussian",
+          "lorentzian",
+          "voigt"
+        ],
+        "max_peaks": 3,
+        "criterion": "bic",
+        "multistarts": 3
+      }
+    }
+  },
+  "spectra": [
+    {
+      "id": "gaussian",
+      "label": "SYNTHETIC gaussian",
+      "input": {
+        "path": "data/gaussian.csv"
+      }
+    },
+    {
+      "id": "lorentzian",
+      "label": "SYNTHETIC lorentzian",
+      "input": {
+        "path": "data/lorentzian.csv"
+      }
+    },
+    {
+      "id": "voigt",
+      "label": "SYNTHETIC voigt",
+      "input": {
+        "path": "data/voigt.csv"
+      }
+    }
+  ],
+  "tracking": {
+    "enabled": false
+  }
+}

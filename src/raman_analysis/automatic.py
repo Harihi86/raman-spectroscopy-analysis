@@ -1,4 +1,4 @@
-"""Automatic Gaussian proposals and explicit, conditional peak-count selection.
+"""Automatic proposals and conditional peak-count / peak-family comparison.
 
 Detection uses smoothed data only for initialization. Every candidate model is
 fitted to the same original samples. Information criteria are rankings under an
@@ -12,6 +12,7 @@ from scipy.ndimage import gaussian_filter1d
 from scipy.signal import find_peaks
 
 from .fitting import FWHM_FACTOR, fit_peaks
+from .profiles import PARAMETERS
 
 
 @dataclass(frozen=True)
@@ -25,6 +26,7 @@ class AutoSettings:
     max_sigma_cm1: float | None = None
     min_separation_cm1: float | None = None
     multistarts: int = 3
+    shapes: tuple | list = ("gaussian",)
 
     def __post_init__(self):
         if type(self.max_peaks) is not int or not 1 <= self.max_peaks <= 8:
@@ -33,6 +35,15 @@ class AutoSettings:
             raise ValueError("auto.multistarts must be an integer in [1, 12]")
         if self.criterion not in {"bic", "aicc"}:
             raise ValueError("auto.criterion must be bic or aicc")
+        if (
+            not isinstance(self.shapes, (list, tuple))
+            or not self.shapes
+            or any(not isinstance(s, str) or s not in PARAMETERS for s in self.shapes)
+            or len(set(self.shapes)) != len(self.shapes)
+        ):
+            raise ValueError(
+                "auto.shapes must be a nonempty, unique list of gaussian, lorentzian, voigt"
+            )
         for name in (
             "delta_threshold",
             "prominence_snr",
@@ -93,6 +104,8 @@ def _background(x, y, errors, correlation_limit):
         "status": "INCONCLUSIVE" if diagnostics else "PASS",
         "diagnostics": diagnostics,
         "peaks": [],
+        "shape": "background",
+        "mean_parameter_count": 2,
         "rss": rss,
         "rmse": float(np.sqrt(rss / len(x))),
         "residual_lag1_correlation": lag1,
@@ -158,7 +171,13 @@ def _seeds(count, start, proposals, previous, x, smooth, noise, minimum, maximum
     span = float(np.ptp(x))
     if previous and start == 1:
         seeds = [
-            {"center": p["center_cm1"], "sigma": p["sigma_cm1"], "amplitude": p["amplitude"]}
+            {
+                "center": p["center_cm1"],
+                "sigma": p["sigma_cm1"]
+                if previous["shape"] == "gaussian"
+                else p["fwhm_cm1"] / FWHM_FACTOR,
+                "amplitude": p["amplitude"],
+            }
             for p in previous["peaks"]
         ]
         residual = gaussian_filter1d(previous["residuals"], 1.5)
@@ -182,7 +201,13 @@ def _seeds(count, start, proposals, previous, x, smooth, noise, minimum, maximum
         )
     elif previous and start >= 2:
         seeds = [
-            {"center": p["center_cm1"], "sigma": p["sigma_cm1"], "amplitude": p["amplitude"]}
+            {
+                "center": p["center_cm1"],
+                "sigma": p["sigma_cm1"]
+                if previous["shape"] == "gaussian"
+                else p["fwhm_cm1"] / FWHM_FACTOR,
+                "amplitude": p["amplitude"],
+            }
             for p in previous["peaks"]
         ]
         broadest = max(range(len(seeds)), key=lambda i: seeds[i]["sigma"])
@@ -228,7 +253,42 @@ def _seeds(count, start, proposals, previous, x, smooth, noise, minimum, maximum
     return normalized
 
 
-def auto_fit(x, y, *, auto=None, errors=None, max_nfev=3000, residual_correlation_limit=0.35):
+def _shape_seeds(seeds, shape, start):
+    if seeds is None or shape == "gaussian":
+        return seeds
+    converted = []
+    for seed in seeds:
+        width = seed["sigma"]
+        minimum, maximum = seed["sigma_bounds"]
+        item = {"center": seed["center"], "amplitude": seed["amplitude"]}
+        if shape == "lorentzian":
+            item.update(
+                gamma=width * FWHM_FACTOR / 2,
+                gamma_bounds=[b * FWHM_FACTOR / 2 for b in (minimum, maximum)],
+            )
+        else:
+            # Start at different convolution mixtures. Positive floors permit
+            # near-Gaussian / near-Lorentzian limits; the *total* fitted FWHM
+            # is separately checked against the original resolution interval.
+            fraction = (0.5, 0.2, 0.8)[start % 3]
+            item.update(
+                sigma=_clip_sigma(width * (1 - fraction), minimum * 1e-3, maximum, 0.01),
+                gamma=_clip_sigma(
+                    width * fraction * FWHM_FACTOR / 2,
+                    minimum * FWHM_FACTOR * 1e-3 / 2,
+                    maximum * FWHM_FACTOR / 2,
+                    0.01,
+                ),
+                sigma_bounds=[minimum * 1e-3, maximum],
+                gamma_bounds=[minimum * FWHM_FACTOR * 1e-3 / 2, maximum * FWHM_FACTOR / 2],
+            )
+        converted.append(item)
+    return converted
+
+
+def _auto_fit_family(
+    x, y, *, shape, auto=None, errors=None, max_nfev=3000, residual_correlation_limit=0.35
+):
     if auto is not None and not isinstance(auto, dict):
         raise ValueError("fit.auto must be an object")
     config = AutoSettings(**(auto or {}))
@@ -281,13 +341,15 @@ def auto_fit(x, y, *, auto=None, errors=None, max_nfev=3000, residual_correlatio
     ]
     incomplete = False
     previous = None
+    size = len(PARAMETERS[shape])
     for count in range(1, config.max_peaks + 1):
         attempts = []
-        if not affine and len(x) > 3 * count + 4:
+        if not affine and len(x) > size * count + 4:
             for start in range(config.multistarts):
                 seeds = _seeds(
                     count, start, proposals, previous, x, smooth, noise, minimum, maximum
                 )
+                seeds = _shape_seeds(seeds, shape, start)
                 if seeds is None:
                     continue
                 try:
@@ -295,6 +357,7 @@ def auto_fit(x, y, *, auto=None, errors=None, max_nfev=3000, residual_correlatio
                         x,
                         y,
                         seeds,
+                        shape=shape,
                         errors=errors,
                         max_nfev=max_nfev,
                         residual_correlation_limit=residual_correlation_limit,
@@ -319,11 +382,11 @@ def auto_fit(x, y, *, auto=None, errors=None, max_nfev=3000, residual_correlatio
                     }
                 )
                 if fitted["status"] != "FAIL" and np.isfinite(fitted["rss"]):
-                    score = information_criteria(fitted["residuals"], 3 * count + 2, errors)[
+                    score = information_criteria(fitted["residuals"], size * count + 2, errors)[
                         config.criterion
                     ]
                     previous_score = (
-                        information_criteria(fits[count]["residuals"], 3 * count + 2, errors)[
+                        information_criteria(fits[count]["residuals"], size * count + 2, errors)[
                             config.criterion
                         ]
                         if count in fits
@@ -338,7 +401,7 @@ def auto_fit(x, y, *, auto=None, errors=None, max_nfev=3000, residual_correlatio
                     "peak_count": count,
                     "fit_status": fitted["status"],
                     "attempts": attempts,
-                    **information_criteria(fitted["residuals"], 3 * count + 2, errors),
+                    **information_criteria(fitted["residuals"], size * count + 2, errors),
                 }
             )
             previous = fitted
@@ -386,15 +449,20 @@ def auto_fit(x, y, *, auto=None, errors=None, max_nfev=3000, residual_correlatio
     if any(b - a < separation for a, b in zip(centers, centers[1:])):
         reasons.append("selected components are closer than the configured minimum separation")
     if any(
-        min(p["center_cm1"] - x[0], x[-1] - p["center_cm1"]) < p["sigma_cm1"]
+        min(p["center_cm1"] - x[0], x[-1] - p["center_cm1"]) < p["fwhm_cm1"] / FWHM_FACTOR
         for p in result["peaks"]
     ):
         reasons.append("a selected component is truncated by the fit window")
+    if shape == "voigt" and any(
+        p["fwhm_cm1"] < minimum * FWHM_FACTOR or p["fwhm_cm1"] > maximum * FWHM_FACTOR
+        for p in result["peaks"]
+    ):
+        reasons.append("a Voigt total FWHM is outside the configured resolution interval")
     diagnostics.extend(reasons)
     result["diagnostics"] = diagnostics
     result["status"] = "INCONCLUSIVE" if diagnostics else "PASS"
     result["model_selection"] = {
-        "method": "automatic Gaussian count comparison",
+        "method": f"automatic {shape} count comparison",
         "settings": asdict(config),
         "criterion": config.criterion,
         "selected_peak_count": selected,
@@ -410,4 +478,105 @@ def auto_fit(x, y, *, auto=None, errors=None, max_nfev=3000, residual_correlatio
         "scope": "conditional rankings under independent Gaussian errors and a fixed baseline; not physical mode identification or calibrated probabilities",
         "search_complete": not incomplete,
     }
+    for candidate in candidates:
+        candidate["shape"] = shape if candidate["peak_count"] else "background"
+        candidate["mean_parameters"] = size * candidate["peak_count"] + 2
+    return result
+
+
+def auto_fit(x, y, *, auto=None, errors=None, max_nfev=3000, residual_correlation_limit=0.35):
+    """Compare all requested homogeneous families on identical observations.
+
+    No diagnostic-based exclusion or favorable-model fallback enters scoring.
+    Family disagreement and incomplete searches remain explicit warnings.
+    """
+    if auto is not None and not isinstance(auto, dict):
+        raise ValueError("fit.auto must be an object")
+    config = AutoSettings(**(auto or {}))
+    families = {
+        shape: _auto_fit_family(
+            x,
+            y,
+            shape=shape,
+            auto=auto,
+            errors=errors,
+            max_nfev=max_nfev,
+            residual_correlation_limit=residual_correlation_limit,
+        )
+        for shape in config.shapes
+    }
+    candidates, comparisons = [], []
+    for index, (shape, fitted) in enumerate(families.items()):
+        selection = fitted["model_selection"]
+        selected = selection["selected_peak_count"]
+        best = next(c for c in selection["candidates"] if c["peak_count"] == selected)
+        comparisons.append(
+            {
+                "shape": shape,
+                "selected_peak_count": selected,
+                "plausible_peak_counts": selection["plausible_peak_counts"],
+                "status": fitted["status"],
+                "diagnostics": list(fitted["diagnostics"]),
+                "rss": fitted["rss"],
+                "bic": best["bic"],
+                "aicc": best["aicc"],
+                "mean_parameters": best["mean_parameters"],
+                "search_complete": selection["search_complete"],
+                "peaks": fitted["peaks"],
+            }
+        )
+        for candidate in selection["candidates"]:
+            if index and candidate["peak_count"] == 0:
+                continue
+            candidates.append({**candidate, "delta_within_shape": candidate["delta"]})
+    criterion = config.criterion
+    best = min(
+        (c for c in candidates if c[criterion] is not None),
+        key=lambda c: (c[criterion], c["peak_count"], c["shape"]),
+    )
+    selected_shape = best["shape"]
+    source_family = config.shapes[0] if selected_shape == "background" else selected_shape
+    result = dict(families[source_family])
+    decision = dict(result["model_selection"])
+    for candidate in candidates:
+        candidate["delta"] = (
+            float(candidate[criterion] - best[criterion])
+            if candidate[criterion] is not None
+            else None
+        )
+    plausible_models = [
+        {"shape": c["shape"], "peak_count": c["peak_count"]}
+        for c in candidates
+        if c["delta"] is not None and c["delta"] <= config.delta_threshold
+    ]
+    plausible_counts = sorted({m["peak_count"] for m in plausible_models})
+    diagnostics = list(result["diagnostics"])
+    if len(plausible_counts) > 1 and not any("multiple peak counts" in d for d in diagnostics):
+        diagnostics.append(
+            "multiple peak counts are within the configured information-criterion margin"
+        )
+    shape_sensitive = len({c["selected_peak_count"] for c in comparisons}) > 1
+    if shape_sensitive:
+        diagnostics.append("best peak count changes across the compared peak families")
+    complete = all(c["search_complete"] for c in comparisons)
+    if not complete and not any("search is incomplete" in d for d in diagnostics):
+        diagnostics.append("candidate search is incomplete in a compared peak family")
+    result["diagnostics"] = diagnostics
+    result["status"] = "INCONCLUSIVE" if diagnostics else "PASS"
+    decision.update(
+        method="automatic peak-family and count comparison",
+        candidates=candidates,
+        selected_shape=selected_shape,
+        selected_peak_count=best["peak_count"],
+        plausible_peak_counts=plausible_counts,
+        plausible_models=plausible_models,
+        count_status=result["status"],
+        search_complete=complete,
+        shape_comparison=comparisons,
+        shape_count_stability="SENSITIVE" if shape_sensitive else "AGREEMENT",
+        comparison_scope="same baseline-corrected original samples and likelihood; no cross-baseline score ranking",
+    )
+    result["model_selection"] = decision
+    # Numerical curves are exported separately; never serialized as JSON arrays.
+    result["comparison_fits"] = families
     return result

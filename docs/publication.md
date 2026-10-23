@@ -16,4 +16,4 @@ Public examples must be generated from the documented commands. Runtime output
 under `runs/` is ignored and should be reviewed before sharing, since user-supplied
 paths, commands, source or scientific data can contain private information.
 
-Version 0.3 reports aggregate applicability observations from locally authorized measured pressure spectra. Raw measurements, derived measurement curves, private acquisition profiles, paths and per-spectrum measurement parameters are kept outside the public repository. Public CI uses synthetic/analytical fixtures; it does not access those private workbooks.
+Versions 0.3–0.4 report aggregate applicability and stability observations from locally authorized measured pressure spectra. Raw measurements, derived measurement curves, private acquisition profiles, paths and per-spectrum measurement parameters are kept outside the public repository. Public CI uses synthetic/analytical fixtures; it does not access those private workbooks.

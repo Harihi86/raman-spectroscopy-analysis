@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.0 — 2026-10-23
+
+- Added height-normalized Lorentzian and exact Voigt fits, analytic derivatives stable near pure-family limits, exact Voigt FWHM and full covariance propagation for widths/areas.
+- Added automatic family/count comparison with 3N+2 versus 4N+2 mean-parameter penalties, one shared zero model, visible within-family optima and conservative disagreement diagnostics.
+- Added adaptive arPLS baselines with recorded convergence/termination and unchanged original-sample fitting; fixed-budget AsLS remains available.
+- Added all-family numerical/graphical comparisons and a saved-batch `stability` command that distinguishes supported agreement, agreement with diagnostics, sensitivity and blocked records.
+- Extended the independent saved-output checker to reconstruct all family curves and recompute their likelihood penalties.
+- Repeated local measured-spectrum validation on the same 184 declared-window spectra across six baseline settings without relaxing existing diagnostics; physical peak-count accuracy still requires independent labels.
+- Updated Chinese/English instructions, measured evidence and a reproducible three-family synthetic fixture.
+
 ## 0.3.0 — 2026-10-23
 
 - Added signal-derived Gaussian seeds, zero-to-N count comparison, BIC/AICc tables, deterministic multi-start search and explicit count ambiguity/limits.

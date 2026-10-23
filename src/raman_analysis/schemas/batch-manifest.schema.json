@@ -190,6 +190,18 @@
                 "items": {
                   "type": "number"
                 }
+              },
+              "gamma": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "gamma_bounds": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "type": "number"
+                }
               }
             }
           }
@@ -213,6 +225,13 @@
         },
         "auto": {
           "$ref": "#/$defs/automatic"
+        },
+        "shape": {
+          "enum": [
+            "gaussian",
+            "lorentzian",
+            "voigt"
+          ]
         }
       },
       "not": {
@@ -220,7 +239,23 @@
           "auto",
           "peaks"
         ]
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "auto"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "shape"
+              ]
+            }
+          }
+        }
+      ]
     },
     "peak": {
       "type": "object",
@@ -249,6 +284,18 @@
           }
         },
         "sigma_bounds": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number"
+          }
+        },
+        "gamma": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "gamma_bounds": {
           "type": "array",
           "minItems": 2,
           "maxItems": 2,
@@ -295,6 +342,35 @@
               "type": "integer",
               "minimum": 1,
               "maximum": 500
+            },
+            "resample": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "method"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "method": {
+              "const": "arpls"
+            },
+            "lam": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "iterations": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "tolerance": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "exclusiveMaximum": 1
             },
             "resample": {
               "type": "boolean"
@@ -505,6 +581,19 @@
               "type": "null"
             }
           ]
+        },
+        "shapes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "gaussian",
+              "lorentzian",
+              "voigt"
+            ]
+          }
         }
       }
     }

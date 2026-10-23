@@ -1,0 +1,112 @@
+{
+  "version": "0.3.0",
+  "date": "2026-10-23",
+  "data_kind": "measurement",
+  "access_scope": "local owner-authorized data; raw measurements and private profiles are not published",
+  "workbooks": 12,
+  "distinct_pressure_spectra": 184,
+  "protocols": {
+    "full": {
+      "spectra": 184,
+      "fit_outcomes": {
+        "INCONCLUSIVE": 184
+      },
+      "at_count_cap": 142,
+      "incomplete_search": 9,
+      "count_ambiguity": 11,
+      "bic_aicc_disagreements": 18,
+      "diagnostics": {
+        "one or more fit parameters lie on a bound": 83,
+        "lag-1 residual correlation exceeds the configured heuristic limit": 144,
+        "best model reaches max_peaks; larger counts have not been assessed": 142,
+        "candidate search is incomplete; one or more peak counts have no converged fit": 9,
+        "a fitted component is below the configured noise-relative amplitude threshold": 56,
+        "a selected component is truncated by the fit window": 115,
+        "multiple peak counts are within the configured information-criterion margin": 11,
+        "local covariance is rank deficient or poorly conditioned": 1,
+        "selected components are closer than the configured minimum separation": 13
+      }
+    },
+    "windowed": {
+      "spectra": 184,
+      "fit_outcomes": {
+        "INCONCLUSIVE": 178,
+        "PASS": 6
+      },
+      "at_count_cap": 98,
+      "incomplete_search": 15,
+      "count_ambiguity": 32,
+      "bic_aicc_disagreements": 49,
+      "diagnostics": {
+        "a fitted component is below the configured noise-relative amplitude threshold": 116,
+        "multiple peak counts are within the configured information-criterion margin": 32,
+        "lag-1 residual correlation exceeds the configured heuristic limit": 93,
+        "a selected component is truncated by the fit window": 90,
+        "one or more fit parameters lie on a bound": 31,
+        "best model reaches max_peaks; larger counts have not been assessed": 98,
+        "candidate search is incomplete; one or more peak counts have no converged fit": 15,
+        "selected components are closer than the configured minimum separation": 5
+      }
+    },
+    "baseline-low": {
+      "spectra": 36,
+      "fit_outcomes": {
+        "INCONCLUSIVE": 34,
+        "PASS": 2
+      },
+      "at_count_cap": 20,
+      "incomplete_search": 2,
+      "count_ambiguity": 6,
+      "bic_aicc_disagreements": 9,
+      "diagnostics": {
+        "lag-1 residual correlation exceeds the configured heuristic limit": 17,
+        "a fitted component is below the configured noise-relative amplitude threshold": 17,
+        "a selected component is truncated by the fit window": 13,
+        "multiple peak counts are within the configured information-criterion margin": 6,
+        "one or more fit parameters lie on a bound": 10,
+        "best model reaches max_peaks; larger counts have not been assessed": 20,
+        "candidate search is incomplete; one or more peak counts have no converged fit": 2,
+        "selected components are closer than the configured minimum separation": 2
+      }
+    },
+    "baseline-high": {
+      "spectra": 36,
+      "fit_outcomes": {
+        "INCONCLUSIVE": 36
+      },
+      "at_count_cap": 14,
+      "incomplete_search": 4,
+      "count_ambiguity": 11,
+      "bic_aicc_disagreements": 10,
+      "diagnostics": {
+        "lag-1 residual correlation exceeds the configured heuristic limit": 21,
+        "multiple peak counts are within the configured information-criterion margin": 11,
+        "a fitted component is below the configured noise-relative amplitude threshold": 21,
+        "a selected component is truncated by the fit window": 27,
+        "one or more fit parameters lie on a bound": 16,
+        "candidate search is incomplete; one or more peak counts have no converged fit": 4,
+        "best model reaches max_peaks; larger counts have not been assessed": 14,
+        "selected components are closer than the configured minimum separation": 5,
+        "local covariance is rank deficient or poorly conditioned": 1
+      }
+    }
+  },
+  "baseline_sensitivity": {
+    "predeclared_spectra": 36,
+    "count_changes": 23,
+    "lambda_values": [
+      100000.0,
+      1000000.0,
+      10000000.0
+    ]
+  },
+  "window_sensitivity": {
+    "spectra": 184,
+    "count_changes": 94
+  },
+  "source_files_unchanged": true,
+  "independent_raw_column_checks": 368,
+  "physical_peak_count_accuracy": "NOT_ASSESSED",
+  "independent_reference_count_labels": false,
+  "public_ci_uses_private_measurements": false
+}

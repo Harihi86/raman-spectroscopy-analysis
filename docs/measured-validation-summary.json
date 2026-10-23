@@ -1,112 +1,827 @@
 {
-  "version": "0.3.0",
-  "date": "2026-10-23",
-  "data_kind": "measurement",
-  "access_scope": "local owner-authorized data; raw measurements and private profiles are not published",
+  "program_version": "0.4.0",
+  "spectra": 184,
   "workbooks": 12,
-  "distinct_pressure_spectra": 184,
-  "protocols": {
-    "full": {
+  "completed_primary_variants": 6,
+  "complete_spectral_analyses": 1104,
+  "family_count_searches": 3312,
+  "variants": {
+    "windowed-asls-100000": {
+      "spectra": 184,
+      "fit_outcomes": {
+        "INCONCLUSIVE": 176,
+        "PASS": 8
+      },
+      "selected_shape_distribution": {
+        "lorentzian": 22,
+        "gaussian": 124,
+        "background": 14,
+        "voigt": 24
+      },
+      "selected_count_distribution": {
+        "2": 15,
+        "0": 14,
+        "5": 127,
+        "4": 17,
+        "3": 8,
+        "1": 3
+      },
+      "at_count_cap": 127,
+      "incomplete_search": 17,
+      "count_ambiguity": 27,
+      "family_best_count_disagreement": 87,
+      "baseline_nonconvergence": 0,
+      "diagnostics": {
+        "lag-1 residual correlation exceeds the configured heuristic limit": 57,
+        "a fitted component is below the configured noise-relative amplitude threshold": 77,
+        "a selected component is truncated by the fit window": 74,
+        "multiple peak counts are within the configured information-criterion margin": 27,
+        "best peak count changes across the compared peak families": 87,
+        "one or more fit parameters lie on a bound": 46,
+        "best model reaches max_peaks; larger counts have not been assessed": 127,
+        "a Voigt total FWHM is outside the configured resolution interval": 2,
+        "candidate search is incomplete; one or more peak counts have no converged fit": 1,
+        "candidate search is incomplete in a compared peak family": 16,
+        "selected components are closer than the configured minimum separation": 2
+      },
+      "families": {
+        "gaussian": {
+          "fit_outcomes": {
+            "INCONCLUSIVE": 174,
+            "PASS": 10
+          },
+          "count_distribution": {
+            "2": 16,
+            "0": 14,
+            "4": 25,
+            "5": 110,
+            "3": 16,
+            "1": 3
+          },
+          "at_count_cap": 110,
+          "incomplete_search": 5,
+          "count_ambiguity": 28,
+          "diagnostics": {
+            "lag-1 residual correlation exceeds the configured heuristic limit": 65,
+            "a fitted component is below the configured noise-relative amplitude threshold": 80,
+            "a selected component is truncated by the fit window": 71,
+            "multiple peak counts are within the configured information-criterion margin": 28,
+            "one or more fit parameters lie on a bound": 32,
+            "best model reaches max_peaks; larger counts have not been assessed": 110,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 5,
+            "selected components are closer than the configured minimum separation": 7
+          },
+          "median_rss": 228930.92465815507
+        },
+        "lorentzian": {
+          "fit_outcomes": {
+            "INCONCLUSIVE": 175,
+            "PASS": 9
+          },
+          "count_distribution": {
+            "2": 13,
+            "0": 14,
+            "4": 20,
+            "3": 10,
+            "5": 123,
+            "1": 4
+          },
+          "at_count_cap": 123,
+          "incomplete_search": 4,
+          "count_ambiguity": 31,
+          "diagnostics": {
+            "lag-1 residual correlation exceeds the configured heuristic limit": 85,
+            "a fitted component is below the configured noise-relative amplitude threshold": 57,
+            "a selected component is truncated by the fit window": 104,
+            "multiple peak counts are within the configured information-criterion margin": 31,
+            "one or more fit parameters lie on a bound": 43,
+            "best model reaches max_peaks; larger counts have not been assessed": 123,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 4,
+            "local covariance is rank deficient or poorly conditioned": 1
+          },
+          "median_rss": 263188.7221221495
+        },
+        "voigt": {
+          "fit_outcomes": {
+            "INCONCLUSIVE": 172,
+            "PASS": 12
+          },
+          "count_distribution": {
+            "2": 19,
+            "0": 18,
+            "5": 94,
+            "4": 30,
+            "1": 7,
+            "3": 16
+          },
+          "at_count_cap": 94,
+          "incomplete_search": 9,
+          "count_ambiguity": 28,
+          "diagnostics": {
+            "one or more fit parameters lie on a bound": 163,
+            "lag-1 residual correlation exceeds the configured heuristic limit": 70,
+            "a fitted component is below the configured noise-relative amplitude threshold": 67,
+            "a selected component is truncated by the fit window": 69,
+            "multiple peak counts are within the configured information-criterion margin": 28,
+            "best model reaches max_peaks; larger counts have not been assessed": 94,
+            "a Voigt total FWHM is outside the configured resolution interval": 3,
+            "local covariance is rank deficient or poorly conditioned": 3,
+            "selected components are closer than the configured minimum separation": 1,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 9
+          },
+          "median_rss": 207553.84323546552
+        }
+      },
+      "bic_aicc_best_count_disagreement": 45
+    },
+    "windowed-asls-1000000": {
+      "spectra": 184,
+      "fit_outcomes": {
+        "INCONCLUSIVE": 182,
+        "PASS": 2
+      },
+      "selected_shape_distribution": {
+        "gaussian": 106,
+        "lorentzian": 37,
+        "voigt": 37,
+        "background": 4
+      },
+      "selected_count_distribution": {
+        "1": 16,
+        "4": 23,
+        "5": 115,
+        "0": 4,
+        "3": 12,
+        "2": 14
+      },
+      "at_count_cap": 115,
+      "incomplete_search": 30,
+      "count_ambiguity": 29,
+      "family_best_count_disagreement": 88,
+      "baseline_nonconvergence": 0,
+      "diagnostics": {
+        "a fitted component is below the configured noise-relative amplitude threshold": 91,
+        "multiple peak counts are within the configured information-criterion margin": 29,
+        "lag-1 residual correlation exceeds the configured heuristic limit": 91,
+        "a selected component is truncated by the fit window": 101,
+        "best peak count changes across the compared peak families": 88,
+        "one or more fit parameters lie on a bound": 58,
+        "best model reaches max_peaks; larger counts have not been assessed": 115,
+        "candidate search is incomplete; one or more peak counts have no converged fit": 8,
+        "candidate search is incomplete in a compared peak family": 22,
+        "selected components are closer than the configured minimum separation": 4,
+        "a Voigt total FWHM is outside the configured resolution interval": 2
+      },
+      "families": {
+        "gaussian": {
+          "fit_outcomes": {
+            "INCONCLUSIVE": 178,
+            "PASS": 6
+          },
+          "count_distribution": {
+            "1": 17,
+            "4": 21,
+            "5": 98,
+            "3": 23,
+            "0": 4,
+            "2": 21
+          },
+          "at_count_cap": 98,
+          "incomplete_search": 15,
+          "count_ambiguity": 32,
+          "diagnostics": {
+            "a fitted component is below the configured noise-relative amplitude threshold": 116,
+            "multiple peak counts are within the configured information-criterion margin": 32,
+            "lag-1 residual correlation exceeds the configured heuristic limit": 93,
+            "a selected component is truncated by the fit window": 90,
+            "one or more fit parameters lie on a bound": 31,
+            "best model reaches max_peaks; larger counts have not been assessed": 98,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 15,
+            "selected components are closer than the configured minimum separation": 5
+          },
+          "median_rss": 247133.1507985516
+        },
+        "lorentzian": {
+          "fit_outcomes": {
+            "PASS": 4,
+            "INCONCLUSIVE": 180
+          },
+          "count_distribution": {
+            "1": 17,
+            "5": 99,
+            "4": 27,
+            "3": 22,
+            "0": 4,
+            "2": 15
+          },
+          "at_count_cap": 99,
+          "incomplete_search": 13,
+          "count_ambiguity": 40,
+          "diagnostics": {
+            "a fitted component is below the configured noise-relative amplitude threshold": 65,
+            "multiple peak counts are within the configured information-criterion margin": 40,
+            "lag-1 residual correlation exceeds the configured heuristic limit": 113,
+            "one or more fit parameters lie on a bound": 48,
+            "best model reaches max_peaks; larger counts have not been assessed": 99,
+            "a selected component is truncated by the fit window": 115,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 13,
+            "selected components are closer than the configured minimum separation": 4
+          },
+          "median_rss": 316815.4569077631
+        },
+        "voigt": {
+          "fit_outcomes": {
+            "INCONCLUSIVE": 180,
+            "PASS": 4
+          },
+          "count_distribution": {
+            "1": 19,
+            "4": 35,
+            "5": 86,
+            "0": 5,
+            "3": 18,
+            "2": 21
+          },
+          "at_count_cap": 86,
+          "incomplete_search": 14,
+          "count_ambiguity": 34,
+          "diagnostics": {
+            "a fitted component is below the configured noise-relative amplitude threshold": 99,
+            "one or more fit parameters lie on a bound": 160,
+            "lag-1 residual correlation exceeds the configured heuristic limit": 94,
+            "a selected component is truncated by the fit window": 97,
+            "best model reaches max_peaks; larger counts have not been assessed": 86,
+            "multiple peak counts are within the configured information-criterion margin": 34,
+            "local covariance is rank deficient or poorly conditioned": 2,
+            "selected components are closer than the configured minimum separation": 1,
+            "a Voigt total FWHM is outside the configured resolution interval": 8,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 14
+          },
+          "median_rss": 227757.13426532014
+        }
+      },
+      "bic_aicc_best_count_disagreement": 50
+    },
+    "windowed-asls-10000000": {
       "spectra": 184,
       "fit_outcomes": {
         "INCONCLUSIVE": 184
       },
-      "at_count_cap": 142,
-      "incomplete_search": 9,
-      "count_ambiguity": 11,
-      "bic_aicc_disagreements": 18,
+      "selected_shape_distribution": {
+        "lorentzian": 47,
+        "gaussian": 100,
+        "voigt": 37
+      },
+      "selected_count_distribution": {
+        "1": 12,
+        "2": 21,
+        "3": 18,
+        "4": 30,
+        "5": 103
+      },
+      "at_count_cap": 103,
+      "incomplete_search": 41,
+      "count_ambiguity": 48,
+      "family_best_count_disagreement": 104,
+      "baseline_nonconvergence": 0,
       "diagnostics": {
-        "one or more fit parameters lie on a bound": 83,
-        "lag-1 residual correlation exceeds the configured heuristic limit": 144,
-        "best model reaches max_peaks; larger counts have not been assessed": 142,
-        "candidate search is incomplete; one or more peak counts have no converged fit": 9,
-        "a fitted component is below the configured noise-relative amplitude threshold": 56,
-        "a selected component is truncated by the fit window": 115,
-        "multiple peak counts are within the configured information-criterion margin": 11,
-        "local covariance is rank deficient or poorly conditioned": 1,
-        "selected components are closer than the configured minimum separation": 13
-      }
+        "best peak count changes across the compared peak families": 104,
+        "lag-1 residual correlation exceeds the configured heuristic limit": 91,
+        "multiple peak counts are within the configured information-criterion margin": 48,
+        "a fitted component is below the configured noise-relative amplitude threshold": 63,
+        "a selected component is truncated by the fit window": 137,
+        "one or more fit parameters lie on a bound": 95,
+        "best model reaches max_peaks; larger counts have not been assessed": 103,
+        "candidate search is incomplete; one or more peak counts have no converged fit": 13,
+        "candidate search is incomplete in a compared peak family": 28,
+        "selected components are closer than the configured minimum separation": 13,
+        "a Voigt total FWHM is outside the configured resolution interval": 2,
+        "local covariance is rank deficient or poorly conditioned": 3
+      },
+      "families": {
+        "gaussian": {
+          "fit_outcomes": {
+            "INCONCLUSIVE": 183,
+            "PASS": 1
+          },
+          "count_distribution": {
+            "2": 28,
+            "1": 13,
+            "3": 25,
+            "4": 34,
+            "5": 82,
+            "0": 2
+          },
+          "at_count_cap": 82,
+          "incomplete_search": 22,
+          "count_ambiguity": 50,
+          "diagnostics": {
+            "lag-1 residual correlation exceeds the configured heuristic limit": 100,
+            "multiple peak counts are within the configured information-criterion margin": 50,
+            "a fitted component is below the configured noise-relative amplitude threshold": 93,
+            "a selected component is truncated by the fit window": 124,
+            "one or more fit parameters lie on a bound": 75,
+            "best model reaches max_peaks; larger counts have not been assessed": 82,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 22,
+            "selected components are closer than the configured minimum separation": 18,
+            "local covariance is rank deficient or poorly conditioned": 3
+          },
+          "median_rss": 310822.0055174825
+        },
+        "lorentzian": {
+          "fit_outcomes": {
+            "PASS": 2,
+            "INCONCLUSIVE": 182
+          },
+          "count_distribution": {
+            "1": 11,
+            "2": 24,
+            "5": 111,
+            "3": 18,
+            "4": 20
+          },
+          "at_count_cap": 111,
+          "incomplete_search": 17,
+          "count_ambiguity": 44,
+          "diagnostics": {
+            "multiple peak counts are within the configured information-criterion margin": 44,
+            "one or more fit parameters lie on a bound": 102,
+            "a selected component is truncated by the fit window": 157,
+            "a fitted component is below the configured noise-relative amplitude threshold": 55,
+            "lag-1 residual correlation exceeds the configured heuristic limit": 109,
+            "best model reaches max_peaks; larger counts have not been assessed": 111,
+            "selected components are closer than the configured minimum separation": 2,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 17,
+            "local covariance is rank deficient or poorly conditioned": 1
+          },
+          "median_rss": 312303.0850340155
+        },
+        "voigt": {
+          "fit_outcomes": {
+            "PASS": 2,
+            "INCONCLUSIVE": 182
+          },
+          "count_distribution": {
+            "1": 23,
+            "4": 31,
+            "5": 71,
+            "2": 30,
+            "3": 25,
+            "0": 4
+          },
+          "at_count_cap": 71,
+          "incomplete_search": 29,
+          "count_ambiguity": 43,
+          "diagnostics": {
+            "multiple peak counts are within the configured information-criterion margin": 43,
+            "a fitted component is below the configured noise-relative amplitude threshold": 67,
+            "one or more fit parameters lie on a bound": 170,
+            "lag-1 residual correlation exceeds the configured heuristic limit": 99,
+            "a selected component is truncated by the fit window": 127,
+            "best model reaches max_peaks; larger counts have not been assessed": 71,
+            "selected components are closer than the configured minimum separation": 7,
+            "a Voigt total FWHM is outside the configured resolution interval": 18,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 29,
+            "local covariance is rank deficient or poorly conditioned": 4
+          },
+          "median_rss": 287083.6230097455
+        }
+      },
+      "bic_aicc_best_count_disagreement": 55
     },
-    "windowed": {
+    "windowed-arpls-100000": {
       "spectra": 184,
       "fit_outcomes": {
-        "INCONCLUSIVE": 178,
-        "PASS": 6
+        "INCONCLUSIVE": 169,
+        "PASS": 15
       },
-      "at_count_cap": 98,
-      "incomplete_search": 15,
+      "selected_shape_distribution": {
+        "background": 31,
+        "voigt": 22,
+        "gaussian": 122,
+        "lorentzian": 9
+      },
+      "selected_count_distribution": {
+        "0": 31,
+        "5": 96,
+        "4": 28,
+        "3": 15,
+        "2": 7,
+        "1": 7
+      },
+      "at_count_cap": 96,
+      "incomplete_search": 32,
       "count_ambiguity": 32,
-      "bic_aicc_disagreements": 49,
+      "family_best_count_disagreement": 86,
+      "baseline_nonconvergence": 0,
       "diagnostics": {
-        "a fitted component is below the configured noise-relative amplitude threshold": 116,
+        "lag-1 residual correlation exceeds the configured heuristic limit": 56,
+        "candidate search is incomplete in a compared peak family": 27,
+        "one or more fit parameters lie on a bound": 28,
+        "best model reaches max_peaks; larger counts have not been assessed": 96,
+        "a fitted component is below the configured noise-relative amplitude threshold": 55,
+        "selected components are closer than the configured minimum separation": 4,
+        "a Voigt total FWHM is outside the configured resolution interval": 5,
+        "best peak count changes across the compared peak families": 86,
         "multiple peak counts are within the configured information-criterion margin": 32,
-        "lag-1 residual correlation exceeds the configured heuristic limit": 93,
-        "a selected component is truncated by the fit window": 90,
+        "candidate search is incomplete; one or more peak counts have no converged fit": 5,
+        "a selected component is truncated by the fit window": 14
+      },
+      "families": {
+        "gaussian": {
+          "fit_outcomes": {
+            "INCONCLUSIVE": 154,
+            "PASS": 30
+          },
+          "count_distribution": {
+            "0": 32,
+            "5": 88,
+            "4": 34,
+            "2": 10,
+            "3": 12,
+            "1": 8
+          },
+          "at_count_cap": 88,
+          "incomplete_search": 10,
+          "count_ambiguity": 31,
+          "diagnostics": {
+            "lag-1 residual correlation exceeds the configured heuristic limit": 59,
+            "one or more fit parameters lie on a bound": 14,
+            "best model reaches max_peaks; larger counts have not been assessed": 88,
+            "a fitted component is below the configured noise-relative amplitude threshold": 61,
+            "multiple peak counts are within the configured information-criterion margin": 31,
+            "a selected component is truncated by the fit window": 17,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 10,
+            "selected components are closer than the configured minimum separation": 4
+          },
+          "median_rss": 170132.82770056833
+        },
+        "lorentzian": {
+          "fit_outcomes": {
+            "INCONCLUSIVE": 167,
+            "PASS": 17
+          },
+          "count_distribution": {
+            "0": 32,
+            "4": 10,
+            "5": 114,
+            "2": 8,
+            "3": 12,
+            "1": 8
+          },
+          "at_count_cap": 114,
+          "incomplete_search": 20,
+          "count_ambiguity": 28,
+          "diagnostics": {
+            "lag-1 residual correlation exceeds the configured heuristic limit": 63,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 20,
+            "one or more fit parameters lie on a bound": 33,
+            "a fitted component is below the configured noise-relative amplitude threshold": 44,
+            "best model reaches max_peaks; larger counts have not been assessed": 114,
+            "a selected component is truncated by the fit window": 39,
+            "multiple peak counts are within the configured information-criterion margin": 28,
+            "selected components are closer than the configured minimum separation": 2
+          },
+          "median_rss": 247240.8708419593
+        },
+        "voigt": {
+          "fit_outcomes": {
+            "INCONCLUSIVE": 162,
+            "PASS": 22
+          },
+          "count_distribution": {
+            "0": 31,
+            "5": 69,
+            "4": 34,
+            "2": 15,
+            "3": 28,
+            "1": 7
+          },
+          "at_count_cap": 69,
+          "incomplete_search": 9,
+          "count_ambiguity": 34,
+          "diagnostics": {
+            "lag-1 residual correlation exceeds the configured heuristic limit": 60,
+            "one or more fit parameters lie on a bound": 152,
+            "best model reaches max_peaks; larger counts have not been assessed": 69,
+            "a fitted component is below the configured noise-relative amplitude threshold": 51,
+            "selected components are closer than the configured minimum separation": 3,
+            "a Voigt total FWHM is outside the configured resolution interval": 11,
+            "multiple peak counts are within the configured information-criterion margin": 34,
+            "a selected component is truncated by the fit window": 15,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 9
+          },
+          "median_rss": 166205.20675114758
+        }
+      },
+      "bic_aicc_best_count_disagreement": 49
+    },
+    "windowed-arpls-1000000": {
+      "spectra": 184,
+      "fit_outcomes": {
+        "INCONCLUSIVE": 174,
+        "PASS": 10
+      },
+      "selected_shape_distribution": {
+        "gaussian": 117,
+        "background": 29,
+        "lorentzian": 25,
+        "voigt": 13
+      },
+      "selected_count_distribution": {
+        "1": 11,
+        "0": 29,
+        "3": 39,
+        "5": 58,
+        "4": 32,
+        "2": 15
+      },
+      "at_count_cap": 58,
+      "incomplete_search": 39,
+      "count_ambiguity": 62,
+      "family_best_count_disagreement": 129,
+      "baseline_nonconvergence": 0,
+      "diagnostics": {
+        "a fitted component is below the configured noise-relative amplitude threshold": 92,
+        "multiple peak counts are within the configured information-criterion margin": 62,
+        "best peak count changes across the compared peak families": 129,
+        "lag-1 residual correlation exceeds the configured heuristic limit": 98,
         "one or more fit parameters lie on a bound": 31,
-        "best model reaches max_peaks; larger counts have not been assessed": 98,
+        "best model reaches max_peaks; larger counts have not been assessed": 58,
+        "a selected component is truncated by the fit window": 34,
+        "candidate search is incomplete in a compared peak family": 24,
         "candidate search is incomplete; one or more peak counts have no converged fit": 15,
-        "selected components are closer than the configured minimum separation": 5
-      }
-    },
-    "baseline-low": {
-      "spectra": 36,
-      "fit_outcomes": {
-        "INCONCLUSIVE": 34,
-        "PASS": 2
-      },
-      "at_count_cap": 20,
-      "incomplete_search": 2,
-      "count_ambiguity": 6,
-      "bic_aicc_disagreements": 9,
-      "diagnostics": {
-        "lag-1 residual correlation exceeds the configured heuristic limit": 17,
-        "a fitted component is below the configured noise-relative amplitude threshold": 17,
-        "a selected component is truncated by the fit window": 13,
-        "multiple peak counts are within the configured information-criterion margin": 6,
-        "one or more fit parameters lie on a bound": 10,
-        "best model reaches max_peaks; larger counts have not been assessed": 20,
-        "candidate search is incomplete; one or more peak counts have no converged fit": 2,
-        "selected components are closer than the configured minimum separation": 2
-      }
-    },
-    "baseline-high": {
-      "spectra": 36,
-      "fit_outcomes": {
-        "INCONCLUSIVE": 36
-      },
-      "at_count_cap": 14,
-      "incomplete_search": 4,
-      "count_ambiguity": 11,
-      "bic_aicc_disagreements": 10,
-      "diagnostics": {
-        "lag-1 residual correlation exceeds the configured heuristic limit": 21,
-        "multiple peak counts are within the configured information-criterion margin": 11,
-        "a fitted component is below the configured noise-relative amplitude threshold": 21,
-        "a selected component is truncated by the fit window": 27,
-        "one or more fit parameters lie on a bound": 16,
-        "candidate search is incomplete; one or more peak counts have no converged fit": 4,
-        "best model reaches max_peaks; larger counts have not been assessed": 14,
         "selected components are closer than the configured minimum separation": 5,
-        "local covariance is rank deficient or poorly conditioned": 1
-      }
+        "a Voigt total FWHM is outside the configured resolution interval": 3,
+        "local covariance is rank deficient or poorly conditioned": 2
+      },
+      "families": {
+        "gaussian": {
+          "fit_outcomes": {
+            "INCONCLUSIVE": 168,
+            "PASS": 16
+          },
+          "count_distribution": {
+            "1": 13,
+            "0": 38,
+            "3": 37,
+            "4": 36,
+            "5": 45,
+            "2": 15
+          },
+          "at_count_cap": 45,
+          "incomplete_search": 15,
+          "count_ambiguity": 56,
+          "diagnostics": {
+            "a fitted component is below the configured noise-relative amplitude threshold": 92,
+            "multiple peak counts are within the configured information-criterion margin": 56,
+            "lag-1 residual correlation exceeds the configured heuristic limit": 100,
+            "a selected component is truncated by the fit window": 27,
+            "best model reaches max_peaks; larger counts have not been assessed": 45,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 15,
+            "one or more fit parameters lie on a bound": 10,
+            "selected components are closer than the configured minimum separation": 7,
+            "local covariance is rank deficient or poorly conditioned": 1
+          },
+          "median_rss": 275097.11590959714
+        },
+        "lorentzian": {
+          "fit_outcomes": {
+            "INCONCLUSIVE": 168,
+            "PASS": 16
+          },
+          "count_distribution": {
+            "1": 10,
+            "0": 40,
+            "4": 23,
+            "5": 68,
+            "3": 26,
+            "2": 17
+          },
+          "at_count_cap": 68,
+          "incomplete_search": 17,
+          "count_ambiguity": 51,
+          "diagnostics": {
+            "a fitted component is below the configured noise-relative amplitude threshold": 61,
+            "multiple peak counts are within the configured information-criterion margin": 51,
+            "lag-1 residual correlation exceeds the configured heuristic limit": 116,
+            "one or more fit parameters lie on a bound": 49,
+            "best model reaches max_peaks; larger counts have not been assessed": 68,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 17,
+            "a selected component is truncated by the fit window": 64,
+            "selected components are closer than the configured minimum separation": 4,
+            "local covariance is rank deficient or poorly conditioned": 2
+          },
+          "median_rss": 289315.0396356047
+        },
+        "voigt": {
+          "fit_outcomes": {
+            "INCONCLUSIVE": 167,
+            "PASS": 17
+          },
+          "count_distribution": {
+            "1": 14,
+            "0": 48,
+            "3": 35,
+            "4": 40,
+            "5": 30,
+            "2": 17
+          },
+          "at_count_cap": 30,
+          "incomplete_search": 24,
+          "count_ambiguity": 42,
+          "diagnostics": {
+            "one or more fit parameters lie on a bound": 132,
+            "a fitted component is below the configured noise-relative amplitude threshold": 77,
+            "multiple peak counts are within the configured information-criterion margin": 42,
+            "lag-1 residual correlation exceeds the configured heuristic limit": 106,
+            "a selected component is truncated by the fit window": 22,
+            "best model reaches max_peaks; larger counts have not been assessed": 30,
+            "selected components are closer than the configured minimum separation": 1,
+            "a Voigt total FWHM is outside the configured resolution interval": 8,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 24
+          },
+          "median_rss": 288805.2848503761
+        }
+      },
+      "bic_aicc_best_count_disagreement": 95
+    },
+    "windowed-arpls-10000000": {
+      "spectra": 184,
+      "fit_outcomes": {
+        "PASS": 5,
+        "INCONCLUSIVE": 179
+      },
+      "selected_shape_distribution": {
+        "gaussian": 115,
+        "voigt": 25,
+        "background": 10,
+        "lorentzian": 34
+      },
+      "selected_count_distribution": {
+        "1": 12,
+        "2": 21,
+        "4": 45,
+        "5": 74,
+        "0": 10,
+        "3": 22
+      },
+      "at_count_cap": 74,
+      "incomplete_search": 47,
+      "count_ambiguity": 46,
+      "family_best_count_disagreement": 118,
+      "baseline_nonconvergence": 0,
+      "diagnostics": {
+        "a fitted component is below the configured noise-relative amplitude threshold": 87,
+        "multiple peak counts are within the configured information-criterion margin": 46,
+        "a selected component is truncated by the fit window": 71,
+        "best peak count changes across the compared peak families": 118,
+        "lag-1 residual correlation exceeds the configured heuristic limit": 94,
+        "one or more fit parameters lie on a bound": 60,
+        "best model reaches max_peaks; larger counts have not been assessed": 74,
+        "selected components are closer than the configured minimum separation": 5,
+        "a Voigt total FWHM is outside the configured resolution interval": 2,
+        "candidate search is incomplete in a compared peak family": 25,
+        "candidate search is incomplete; one or more peak counts have no converged fit": 22
+      },
+      "families": {
+        "gaussian": {
+          "fit_outcomes": {
+            "PASS": 12,
+            "INCONCLUSIVE": 172
+          },
+          "count_distribution": {
+            "1": 14,
+            "2": 26,
+            "3": 24,
+            "4": 39,
+            "5": 63,
+            "0": 18
+          },
+          "at_count_cap": 63,
+          "incomplete_search": 30,
+          "count_ambiguity": 46,
+          "diagnostics": {
+            "a fitted component is below the configured noise-relative amplitude threshold": 99,
+            "multiple peak counts are within the configured information-criterion margin": 46,
+            "a selected component is truncated by the fit window": 45,
+            "lag-1 residual correlation exceeds the configured heuristic limit": 95,
+            "one or more fit parameters lie on a bound": 22,
+            "best model reaches max_peaks; larger counts have not been assessed": 63,
+            "selected components are closer than the configured minimum separation": 10,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 30
+          },
+          "median_rss": 301479.1828700241
+        },
+        "lorentzian": {
+          "fit_outcomes": {
+            "INCONCLUSIVE": 178,
+            "PASS": 6
+          },
+          "count_distribution": {
+            "1": 15,
+            "2": 16,
+            "5": 81,
+            "3": 28,
+            "4": 32,
+            "0": 12
+          },
+          "at_count_cap": 81,
+          "incomplete_search": 15,
+          "count_ambiguity": 56,
+          "diagnostics": {
+            "multiple peak counts are within the configured information-criterion margin": 56,
+            "a fitted component is below the configured noise-relative amplitude threshold": 73,
+            "a selected component is truncated by the fit window": 110,
+            "lag-1 residual correlation exceeds the configured heuristic limit": 116,
+            "one or more fit parameters lie on a bound": 61,
+            "best model reaches max_peaks; larger counts have not been assessed": 81,
+            "selected components are closer than the configured minimum separation": 1,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 15
+          },
+          "median_rss": 320368.1982266082
+        },
+        "voigt": {
+          "fit_outcomes": {
+            "PASS": 7,
+            "INCONCLUSIVE": 177
+          },
+          "count_distribution": {
+            "1": 17,
+            "4": 39,
+            "5": 48,
+            "0": 23,
+            "2": 35,
+            "3": 22
+          },
+          "at_count_cap": 48,
+          "incomplete_search": 36,
+          "count_ambiguity": 44,
+          "diagnostics": {
+            "one or more fit parameters lie on a bound": 154,
+            "a fitted component is below the configured noise-relative amplitude threshold": 86,
+            "multiple peak counts are within the configured information-criterion margin": 44,
+            "lag-1 residual correlation exceeds the configured heuristic limit": 97,
+            "a selected component is truncated by the fit window": 52,
+            "best model reaches max_peaks; larger counts have not been assessed": 48,
+            "a Voigt total FWHM is outside the configured resolution interval": 10,
+            "selected components are closer than the configured minimum separation": 2,
+            "candidate search is incomplete; one or more peak counts have no converged fit": 36
+          },
+          "median_rss": 299946.2796751642
+        }
+      },
+      "bic_aicc_best_count_disagreement": 74
     }
   },
-  "baseline_sensitivity": {
-    "predeclared_spectra": 36,
-    "count_changes": 23,
-    "lambda_values": [
-      100000.0,
-      1000000.0,
-      10000000.0
-    ]
+  "strict_stability": {
+    "SENSITIVE": 182,
+    "AGREEMENT_ONLY": 2
   },
-  "window_sensitivity": {
-    "spectra": 184,
-    "count_changes": 94
+  "best_overall_count_changes_across_six_baselines": 163,
+  "within_method_lambda_count_changes_by_family": {
+    "asls": {
+      "gaussian": 111,
+      "lorentzian": 97,
+      "voigt": 125
+    },
+    "arpls": {
+      "gaussian": 150,
+      "lorentzian": 132,
+      "voigt": 162
+    }
   },
-  "source_files_unchanged": true,
-  "independent_raw_column_checks": 368,
+  "gaussian_v03_regression": {
+    "records": 184,
+    "same_selected_count": 184,
+    "same_rss_within_1e_10": 184
+  },
+  "raw_column_pair_checks": 1104,
+  "source_workbook_hashes_unchanged": 12,
+  "dropped_pairs": 0,
   "physical_peak_count_accuracy": "NOT_ASSESSED",
-  "independent_reference_count_labels": false,
-  "public_ci_uses_private_measurements": false
+  "full_axis_current_version": "optional pilot interrupted; not included in primary validation",
+  "scope": "All 184 previously declared-window spectra, six baseline variants and all three families. No thresholds, count cap or fit budgets relaxed. No cross-baseline IC ranking.",
+  "diagnostic_controls": {
+    "lag1_limit": 0.35,
+    "delta_threshold": 6,
+    "prominence_snr": 4,
+    "max_peaks": 5,
+    "multistarts": 3,
+    "max_nfev": 1500,
+    "covariance_condition_limit": 10000000000.0
+  },
+  "real_data_publication": "source measurements, derived curves, per-spectrum results and local manifests excluded",
+  "prior_v03_record": "retained in docs/real-validation-v03.zh-CN.md",
+  "arpls_independent_banded_reference": {
+    "records_checked": 552,
+    "max_absolute_difference": 0.00012681298539973795,
+    "max_error_relative_to_raw_scale": 7.697555390549072e-09,
+    "predeclared_relative_tolerance": 2e-07,
+    "convergence_flag_agreement": 552,
+    "iteration_count_agreement": 552,
+    "numerical_agreement": "PASS",
+    "scope": "Same arPLS equation, independent Cholesky band solver, independent affine solve and logistic survival function; not physical baseline accuracy."
+  },
+  "agreement_only_records_at_search_cap": 2
 }

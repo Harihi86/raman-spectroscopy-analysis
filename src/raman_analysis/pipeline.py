@@ -13,7 +13,8 @@ import pandas as pd
 
 from . import __version__
 from .automatic import auto_fit
-from .baseline import estimate_baseline
+from .baseline import baseline_with_diagnostics
+from .comparison_plot import plot_family_comparison
 from .fitting import fit_peaks
 from .io import load_spectrum
 from .report import selection_html
@@ -29,7 +30,9 @@ def analyze(config, output: Path, *, base: Path = Path("."), save_figures: bool 
     path = (base / source.pop("path")).resolve()
     spectrum = load_spectrum(path, **source)
     baseline_config = config.get("baseline", {"method": "none"})
-    baseline = estimate_baseline(spectrum.x, spectrum.y, baseline_config)
+    baseline, baseline_diagnostics = baseline_with_diagnostics(
+        spectrum.x, spectrum.y, baseline_config
+    )
     corrected = spectrum.y - baseline
     fit_config = dict(config["fit"])
     window = fit_config.pop("window", [float(spectrum.x[0]), float(spectrum.x[-1])])
@@ -45,12 +48,18 @@ def analyze(config, output: Path, *, base: Path = Path("."), save_figures: bool 
         errors=spectrum.sigma[selection] if spectrum.sigma is not None else None,
         **fit_config,
     )
+    if baseline_diagnostics["diagnostics"]:
+        fit["diagnostics"].extend(baseline_diagnostics["diagnostics"])
+        if fit["status"] == "PASS":
+            fit["status"] = "INCONCLUSIVE"
+        if "model_selection" in fit:
+            fit["model_selection"]["count_status"] = fit["status"]
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     summary = {
         k: v
         for k, v in fit.items()
-        if k not in {"fitted", "residuals", "components", "residual_background"}
+        if k not in {"fitted", "residuals", "components", "residual_background", "comparison_fits"}
     }
     summary.update(
         {
@@ -58,6 +67,7 @@ def analyze(config, output: Path, *, base: Path = Path("."), save_figures: bool 
             "program_version": __version__,
             "provenance": spectrum.provenance,
             "baseline": baseline_config,
+            "baseline_diagnostics": baseline_diagnostics,
             "fit_configuration": config["fit"],
             "metadata": config.get("metadata", {}),
             "python": platform.python_version(),
@@ -107,10 +117,20 @@ def analyze(config, output: Path, *, base: Path = Path("."), save_figures: bool 
     if spectrum.sigma is not None:
         fit_frame["measurement_sigma"] = spectrum.sigma[selection]
     for i, component in enumerate(fit["components"]):
-        fit_frame[f"gaussian_{i + 1}"] = component
+        fit_frame[f"{fit['shape']}_{i + 1}"] = component
     pd.DataFrame(fit_frame).to_csv(output / "fit.csv", index=False)
+    if "comparison_fits" in fit:
+        comparison_frame = {"shift_cm1": spectrum.x[selection]}
+        for shape, alternative in fit["comparison_fits"].items():
+            comparison_frame[f"{shape}_fitted_corrected"] = alternative["fitted"]
+            comparison_frame[f"{shape}_residual"] = alternative["residuals"]
+            comparison_frame[f"{shape}_residual_background"] = alternative["residual_background"]
+            for i, component in enumerate(alternative["components"]):
+                comparison_frame[f"{shape}_component_{i + 1}"] = component
+        pd.DataFrame(comparison_frame).to_csv(output / "shape-comparison.csv", index=False)
     if save_figures:
         plot_spectrum(spectrum, baseline, corrected, selection, fit, data_kind, output)
+        plot_family_comparison(spectrum.x[selection], corrected[selection], fit, data_kind, output)
     manifest = {
         p.name: hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted(output.iterdir())
@@ -121,6 +141,7 @@ def analyze(config, output: Path, *, base: Path = Path("."), save_figures: bool 
 
 
 def plot_spectrum(spectrum, baseline, corrected, selection, fit, data_kind, output):
+    shape = fit.get("shape", "gaussian").capitalize()
     fig, axes = plt.subplots(
         3,
         1,
@@ -142,10 +163,10 @@ def plot_spectrum(spectrum, baseline, corrected, selection, fit, data_kind, outp
         spectrum.x[selection],
         fit["fitted"],
         color="#137b80",
-        label="Gaussian model + linear residual background",
+        label=f"{shape} model + linear residual background",
     )
     for i, curve in enumerate(fit["components"]):
-        axes[1].plot(spectrum.x[selection], curve, "--", lw=1, label=f"Gaussian {i + 1}")
+        axes[1].plot(spectrum.x[selection], curve, "--", lw=1, label=f"{shape} {i + 1}")
     axes[2].plot(spectrum.x[selection], fit["residuals"], color="#435669", lw=0.7)
     axes[2].axhline(0, color="#444444", lw=0.6)
     for ax in axes[:2]:
@@ -155,7 +176,7 @@ def plot_spectrum(spectrum, baseline, corrected, selection, fit, data_kind, outp
     axes[2].set_xlabel(r"Raman shift (cm$^{-1}$)")
     decision = "AUTO" if "model_selection" in fit else "MANUAL"
     fig.suptitle(
-        f"{data_kind.upper()} | {decision} | {len(fit['peaks'])} Gaussian peaks | {fit['status']}",
+        f"{data_kind.upper()} | {decision} | {len(fit['peaks'])} {shape} peaks | {fit['status']}",
         fontsize=12,
     )
     fig.savefig(output / "spectrum.png", dpi=180)

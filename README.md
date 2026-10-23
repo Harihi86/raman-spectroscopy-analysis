@@ -4,7 +4,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [中文使用指南](docs/usage.zh-CN.md)
 
-**Version 0.3** — a reproducible command-line tool for individual Raman spectra,
+**Version 0.4** — a reproducible command-line tool for individual Raman spectra,
 manifest-based batches and peak tracking across pressure acquisitions. It extends
 the owner-authored SHproject source with configurable, independently tested APIs.
 No experiment profile, fixed pressure table or sample-specific window is imported
@@ -13,8 +13,8 @@ by the supported pipeline.
 ## What you can do
 
 - Read explicit columns, with a declared header row or headerless mode, from CSV, TSV, delimited TXT and XLSX; keep original inputs intact.
-- Estimate an AsLS or reference-region polynomial baseline; fit explicit Gaussians or compare automatic 0–N component models.
-- Propose seeds from the signal, compare BIC/AICc, and keep count ambiguity and model inadequacy visible.
+- Estimate an AsLS, noise-adaptive arPLS or reference-region polynomial baseline; fit Gaussian, Lorentzian or exact Voigt peaks and compare automatic 0–N models.
+- Propose seeds from the signal, compare BIC/AICc with family-specific parameter counts, and retain count ambiguity and model inadequacy.
 - Process spectra with shared defaults and per-spectrum overrides; save each failure independently.
 - Track accepted fitted peaks within independently named series, in acquisition order.
 - Preserve repeated/decreasing pressures, missing metadata, peak births/disappearances and gaps.
@@ -72,11 +72,12 @@ raman-analyze demo-batch --automatic --scenario crossing --output runs/automatic
 raman-analyze batch examples/automatic/manifest.json --output runs/auto-manifest
 ```
 
-Use `"fit": {"auto": {"max_peaks": 5, "criterion": "bic"}}` instead of `fit.peaks`.
-The fitter compares a zero-peak linear background and 1–N Gaussian models on the same original samples.
+Use `"fit": {"auto": {"shapes": ["gaussian", "lorentzian", "voigt"], "max_peaks": 5, "criterion": "bic"}}` instead of `fit.peaks`. Omitting `shapes` retains the Gaussian default.
+The fitter compares a zero-peak linear background and 1–N models from each requested family on the same original samples.
 `model-selection.json`/`.csv` preserve candidate scores, competing counts and search diagnostics.
 BIC/AICc margins are conditional rankings, not count probabilities. A count at the search cap or a poor/ambiguous fit remains INCONCLUSIVE.
-Local measured-data checks exposed substantial limits: only 6/184 spectra passed configured diagnostics in declared windows, and 23/36 prespecified spectra changed their best count across baseline choices. These are applicability checks, not an independently labelled count-accuracy benchmark.
+Across six baseline settings on the same 184 real spectra, 163 changed their overall best count. Including within-family best counts, 182 were sensitive and 2 agreed at the five-peak search cap with unresolved diagnostics; none met the strict supported-stability rule. Existing diagnostic thresholds were unchanged. This is an applicability check, not an independently labelled count-accuracy benchmark.
+Try `raman-analyze batch examples/profiles/manifest.json --output runs/profiles` for a generated three-family comparison. The [profile/baseline guide](docs/profiles-and-baselines.md) documents adaptive baselines and saved-batch stability comparisons.
 See [automatic method](docs/automatic.md) and [中文自动选峰指南](docs/automatic.zh-CN.md).
 
 ## Analyze your own batch
@@ -154,7 +155,7 @@ raman-analyze demo --output runs/single-example
 raman-analyze run examples/synthetic/config.json --output runs/single-fit
 ```
 
-AsLS requires approximately uniform sampling by default; `resample: true` explicitly interpolates only the baseline-estimation grid and maps the estimated baseline back to the original samples. Fits use positive Gaussians with a
+AsLS/arPLS require approximately uniform sampling by default; `resample: true` explicitly interpolates only the baseline-estimation grid and maps the estimated baseline back to the original samples. Fits use positive peaks from an explicitly requested family with a
 linear residual background. Covariance, FWHM and area errors are local estimates
 conditional on a fixed baseline and selected model. Baseline/calibration/model
 uncertainty is not included. Failed or unidentifiable fits do not update tracks.
@@ -175,7 +176,7 @@ partial batches, interruption records, retracking, independent series, crossings
 missing/duplicate pressures and an exhaustive small assignment oracle. CI runs on
 Linux/Windows with Python 3.11/3.12. [Observed validation](docs/validation.md).
 
-Current scope: manual/automatic Gaussian components, explicit tabular imports and local serial batches of up to 10,000 entries. Non-Gaussian models, calibrated tracking probabilities, bootstrap uncertainty, instrument-native formats and independent measured peak-count labels remain future work.
+Current scope: manual/automatic Gaussian, Lorentzian and exact Voigt components, explicit tabular imports and local serial batches of up to 10,000 entries. Homogeneous families are compared on the same corrected observations. Mixed-family component searches, calibrated tracking probabilities, bootstrap uncertainty, instrument-native formats and independent measured peak-count labels remain future work.
 
 ## Source, roadmap and references
 

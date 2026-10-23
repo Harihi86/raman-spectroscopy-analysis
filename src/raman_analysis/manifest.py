@@ -32,6 +32,7 @@ def merge_settings(defaults, overrides):
                 if name == "fit":
                     if "auto" in value and "peaks" not in value:
                         result[name].pop("peaks", None)
+                        result[name].pop("shape", None)
                     elif "peaks" in value and "auto" not in value:
                         result[name].pop("auto", None)
                 result[name] = merge_settings(result[name], value)
@@ -72,6 +73,10 @@ def validate_manifest(manifest) -> list[dict]:
                 f"Spectrum {spectrum_id}: provide exactly one of fit.peaks or fit.auto"
             )
         if "auto" in analysis["fit"]:
+            if "shape" in analysis["fit"]:
+                raise ValueError(
+                    "Use auto.shapes for automatic fitting, fit.shape only for manual fitting"
+                )
             AutoSettings(**analysis["fit"]["auto"])
         resolved_schema = {**schema, "$ref": "#/$defs/analysis"}
         # Remove root-only constraints; retain local references for validation.

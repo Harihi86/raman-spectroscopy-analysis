@@ -13,6 +13,7 @@ from .fitting import gaussian
 from .io import load_spectrum
 from .manifest import validate_manifest
 from .pipeline import analyze
+from .stability import compare_saved_batches
 
 
 def demo(output: Path):
@@ -125,6 +126,21 @@ def main(argv=None):
         "validate", help=text("Validate a batch manifest before execution", "运行前校验批处理清单")
     )
     validation.add_argument("manifest", type=Path)
+    stability = sub.add_parser(
+        "stability",
+        help=text(
+            "Compare saved peak counts across configurations",
+            "比较不同基线或窗口下保存的峰数稳定性",
+        ),
+    )
+    stability.add_argument(
+        "reports",
+        nargs="+",
+        type=Path,
+        help=text(
+            "Complete batch reports for the same spectra", "同一批光谱的多个完整 batch-report.json"
+        ),
+    )
     validation.add_argument(
         "--check-files",
         action="store_true",
@@ -132,7 +148,7 @@ def main(argv=None):
             "Also load and validate every spectrum input", "同时读取并校验各条光谱的输入文件"
         ),
     )
-    for command in (example, run, batch, demonstration, track):
+    for command in (example, run, batch, demonstration, track, stability):
         command.add_argument(
             "--output",
             required=True,
@@ -172,6 +188,8 @@ def main(argv=None):
             report = retrack(
                 args.report, args.output, settings_path=args.settings, figures=not args.no_figures
             )
+        elif args.operation == "stability":
+            report = compare_saved_batches(args.reports, args.output)
         elif args.operation == "validate":
             manifest = json.loads(args.manifest.read_text(encoding="utf-8-sig"))
             spectra = validate_manifest(manifest)
@@ -226,6 +244,17 @@ def main(argv=None):
         }
     elif args.operation == "validate":
         summary = report
+    elif args.operation == "stability":
+        summary = {
+            k: report[k]
+            for k in (
+                "status",
+                "spectra",
+                "variant_count",
+                "stability_counts",
+                "physical_peak_count_accuracy",
+            )
+        }
     else:
         summary = {k: report[k] for k in ("status", "data_kind", "peaks", "diagnostics")}
     if options.json:
@@ -252,9 +281,17 @@ def main(argv=None):
                 + text("Independent series", "独立序列")
                 + f": {summary['series_count']}"
             )
+        elif "stability_counts" in summary:
+            print(
+                text("Spectra", "光谱数")
+                + f": {summary['spectra']}; "
+                + text("Variants", "配置变体")
+                + f": {summary['variant_count']}"
+            )
+            print(text("Count stability", "峰数稳定性") + ": " + str(summary["stability_counts"]))
         if hasattr(args, "output"):
             print(text("Output", "结果目录") + ": " + str(args.output))
-            if args.operation in {"batch", "demo-batch"}:
+            if args.operation in {"batch", "demo-batch", "stability"}:
                 directory = (
                     args.output / "analysis" if args.operation == "demo-batch" else args.output
                 )

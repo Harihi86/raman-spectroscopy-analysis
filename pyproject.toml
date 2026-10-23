@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "raman-spectroscopy-analysis"
-version = "0.3.0"
+version = "0.4.0"
 description = "Manifest-based Raman spectrum fitting and pressure-aware peak tracking"
 readme = "README.md"
 requires-python = ">=3.11"

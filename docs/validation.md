@@ -1,5 +1,38 @@
 # Observed validation / 验证记录
 
+Date: 2026-10-23. Version: 0.4.0. Local host: macOS arm64, CPython 3.12.0.
+
+- Full suite: **142 passed**, no failures/errors/skips.
+- Ruff check/format for source, tests and independent checking tools: PASS.
+- Gaussian/Lorentzian/exact Voigt analytic derivatives match central finite differences with and without measurement weighting, including near-pure limits.
+- Profile heights, full-line areas, exact Voigt half-height widths and covariance cross terms are checked against quadrature/numerical-gradient oracles. An unsorted two-Voigt fit checks all width blocks and covariance ordering.
+- Automatic comparisons count 3 parameters per Gaussian/Lorentzian peak and 4 per Voigt peak; known measurement errors enter likelihood scores. One shared zero-peak model avoids repeated background candidates.
+- Wrong-family fits, count caps, incomplete searches and cross-family disagreement remain visible. Stability tests distinguish supported agreement, agreement with diagnostics, sensitivity and blocked records, and reject changed thresholds or repeated reports.
+- Adaptive arPLS tests exercise noise-offset behavior, affine inputs, explicit irregular-axis interpolation and nonconvergence. A finite baseline curve cannot silently turn nonconvergence into PASS.
+- A fresh environment installed the wheel from its built artifact (not an editable source path), ran the three-profile synthetic batch, and passed independent checks of all nine family-best curves and scores. `pip check`: PASS.
+- All three synthetic inputs select their generating family and one component in the global score comparison; cross-family disagreement remains INCONCLUSIVE. This is a software fixture, not measured accuracy.
+- Chinese offline family/count pages and generated comparison figures were visually inspected.
+
+## Measured-spectrum results
+
+- Same 184 declared-window pressure spectra, six predeclared baseline variants (AsLS/arPLS × lambda 10^5/10^6/10^7), three families: 1104 complete spectral analyses and 3312 family-count searches, including all unresolved candidates.
+- Existing count cap 5, three starts, 1500 evaluations, score margin 6, proposal SNR 4 and residual-correlation limit 0.35 were retained. Supplied-error chi-square and covariance-condition rules were unchanged.
+- Across baseline variants, 163/184 overall best counts changed. Across all baseline/family best counts: 182 SENSITIVE, 2 AGREEMENT_ONLY at the five-peak search cap, 0 SUPPORTED_STABLE. Numerical success does not establish physical mode counts.
+- All 1104 saved outputs passed independent numerical checks, including reconstruction of all 3312 family-best curves and likelihood penalties. All 1104 direct raw-column comparisons passed; 12 source workbook hashes were unchanged; no valid pairs were dropped.
+- The original Gaussian/AsLS central-lambda control reproduces the previous selected count and RSS for 184/184 spectra (RSS relative/absolute tolerance 10^-10).
+- An independent banded-Cholesky arPLS reference checked all 552 curves; maximum error relative to raw intensity scale was 7.70e-9 against a predeclared numerical tolerance of 2e-7. All convergence flags and iteration counts agreed. This checks numerical implementation, not true backgrounds.
+- Adaptive baselines can absorb broad spectral structure. Symmetric profiles, residual assumptions and bounded local search still limit interpretation. Physical count accuracy remains NOT_ASSESSED without independently reviewed labels.
+- Optional new full-axis family runs were interrupted for runtime and excluded. The primary 184-spectrum windowed cohort and diagnostic controls were unchanged; historical full-axis Gaussian results remain separately versioned.
+
+[Completed measured protocol and aggregate evidence](real-validation.zh-CN.md) · [Machine-readable evidence](measured-validation-summary.json).
+The measured record distinguishes unchanged diagnostic controls, baseline/family sensitivity and missing physical reference labels. No public CI access to private measurements is claimed.
+
+The existing [Actions matrix](https://github.com/Harihi86/raman-spectroscopy-analysis/actions/workflows/ci.yml) runs Linux/Windows × Python 3.11/3.12. Check the actual published commit's run; a workflow definition or older green result is narrower evidence than a completed current run.
+
+The records below are retained historical evidence, with their original versions and scopes.
+
+# Historical version 0.3 validation
+
 Date: 2026-10-23. Version: 0.3.0. Local host: macOS arm64, CPython 3.12.0.
 
 - Full suite: **104 passed**, no failures/errors/skips.
@@ -17,7 +50,7 @@ Date: 2026-10-23. Version: 0.3.0. Local host: macOS arm64, CPython 3.12.0.
 - Current source exactly replayed three selected measured records, including a configured PASS and two INCONCLUSIVE cases. The full search traces, peak tables and RSS matched the saved results.
 - Chinese count-comparison pages, the local measured report and selected measured fit/residual plots were visually checked.
 
-[Detailed measured protocol and limits](real-validation.zh-CN.md) · [Aggregate JSON](measured-validation-summary.json).
+[Detailed measured protocol and limits](real-validation-v03.zh-CN.md) · [Aggregate JSON](measured-validation-v03-summary.json).
 These are local real-data observations, not a claim that public CI accessed private measurements.
 Build/install evidence and platform results should be checked for the actual published commit in [Actions](https://github.com/Harihi86/raman-spectroscopy-analysis/actions/workflows/ci.yml).
 

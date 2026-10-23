@@ -194,6 +194,8 @@ def analyze_batch(manifest_path: Path, output: Path, *, no_figures=False, progre
                                 "plausible_peak_counts",
                                 "count_status",
                                 "search_complete",
+                                "selected_shape",
+                                "shape_count_stability",
                             )
                         }
                 except (ValueError, KeyError, TypeError, OSError, IndexError) as exc:
@@ -230,6 +232,8 @@ def analyze_batch(manifest_path: Path, output: Path, *, no_figures=False, progre
             "peak_count",
             "count_status",
             "plausible_peak_counts",
+            "selected_shape",
+            "shape_count_stability",
             "output",
         ]
         pd.DataFrame(
@@ -240,6 +244,10 @@ def analyze_batch(manifest_path: Path, output: Path, *, no_figures=False, progre
                     "count_status": r.get("model_selection", {}).get("count_status", "MANUAL"),
                     "plausible_peak_counts": json.dumps(
                         r.get("model_selection", {}).get("plausible_peak_counts", [])
+                    ),
+                    "selected_shape": r.get("model_selection", {}).get("selected_shape", "MANUAL"),
+                    "shape_count_stability": r.get("model_selection", {}).get(
+                        "shape_count_stability", "NOT_ASSESSED"
                     ),
                 }
                 for r in records

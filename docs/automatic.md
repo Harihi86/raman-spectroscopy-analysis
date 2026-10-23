@@ -1,9 +1,9 @@
-# Automatic Gaussian proposals and component-count comparison
+# Automatic proposals, peak families and component-count comparison
 
 [中文操作说明](automatic.zh-CN.md) · [Configuration](configuration.md)
 
 Use `fit.auto` instead of `fit.peaks`. The implementation compares a zero-component
-linear background and 1–N positive Gaussian models on identical original samples.
+linear background and 1–N positive models from each requested peak family on identical original samples.
 Detection uses [SciPy find_peaks](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html)
 and prominence-relative widths on a smoothed proposal signal. Widths are mapped
 from fractional sample indices onto actual x coordinates. The optimizer always
@@ -11,8 +11,7 @@ uses unsmoothed observations. Local starts use detected proposals, unexplained
 positive residuals and split broad components; this is a bounded search, not a
 proof of a global optimum or a count of physical modes.
 
-For N peaks, p = 3N + 2 fitted mean parameters (amplitude, center and sigma per
-component, plus a residual-background intercept and slope). Let n be the number
+For N peaks, p = 3N + 2 fitted mean parameters for Gaussian/Lorentzian and p = 4N + 2 for Voigt (height, center and the appropriate widths per component, plus a residual-background intercept and slope). Let n be the number
 of original fitted samples and RSS the unweighted residual sum of squares.
 
 Without supplied measurement errors, estimate a common Gaussian variance, use
@@ -38,9 +37,9 @@ Mixture boundaries, overlapping components, estimated baselines and correlated
 residuals violate the simple regular-model interpretation. Score differences are
 not calibrated peak-count probabilities or Bayes factors in this implementation.
 
-All counts within `delta_threshold` of the minimum remain competitive. A best
+All family/count combinations within `delta_threshold` of the minimum remain competitive. A best
 candidate at `max_peaks`, a count without any converged start, a truncated or
-weak component, unresolved separation or a selected-fit diagnostic prevents a
+weak component, unresolved separation, different family-best counts or a selected-fit diagnostic prevents a
 PASS. Numerically converged but diagnostically questionable fits remain visible
 in the score table and cannot silently promote the result to trusted tracking.
 The zero-peak candidate prevents forced discovery of peaks in featureless data.
@@ -58,5 +57,6 @@ Defaults: max count 5 (allowed 1–8), BIC, score margin 6, proposal SNR 4,
 1.5-sample proposal smoothing, 3 starts (allowed 1–12). Physical sigma bounds
 and separation may be declared; otherwise they derive from the actual sampling
 and fit span. No material name, pressure table or experiment profile enters this
-module. An analytic Gaussian Jacobian is tested against central finite differences
-with and without measurement weighting.
+module. Analytic Jacobians for all three families are tested against central finite differences with and without measurement weighting, including Voigt limits. See [profiles, baseline weights and stability rules](profiles-and-baselines.md).
+
+Set `auto.shapes` to a unique nonempty list drawn from `gaussian`, `lorentzian`, `voigt`; the default remains `["gaussian"]`. All families share one zero model. `shape_comparison` retains each family's best count and diagnostics; `shape-comparison.csv` retains their numerical curves. The `stability` command compares saved configurations without refitting or ranking criteria across different baselines.

@@ -52,3 +52,20 @@ summaries use UTF-8 with BOM. Runtime reports can contain user data and local
 paths in error diagnostics; review them before sharing.
 
 Automatic settings and count-score formulas are documented in [automatic.md](automatic.md). AsLS `resample: true` explicitly supports irregular axes by estimating only the baseline on a same-length uniform grid; the fit uses the original samples.
+
+Version 0.4 adds `auto.shapes` (default `["gaussian"]`, unique nonempty subset of
+`gaussian`, `lorentzian`, `voigt`). Manual `fit.shape` defaults to Gaussian;
+Lorentzian seeds use `gamma`/`gamma_bounds`, Voigt uses both Gaussian sigma and
+Lorentzian gamma. Width fields incompatible with the declared manual shape are rejected.
+`fit.shape` and `fit.auto` cannot coexist. Switching into automatic mode removes a stale manual shape.
+
+`baseline.method=arpls` accepts `lam`, `iterations`, `tolerance`, `resample`;
+defaults are 10^6, 100, 0.001, false. `baseline_diagnostics` records solver
+termination, and nonconvergence cannot produce PASS. Fixed-budget AsLS remains
+available and does not assert convergence. [Formula and uncertainty scope](profiles-and-baselines.md).
+
+`shape-comparison.csv` exports each family-best model and residual, with optional
+PNG/PDF comparisons when figures are enabled. `stability` accepts multiple complete
+batch reports for the same observations and writes JSON/CSV/offline HTML. It
+checks matching controls and artifact hashes, keeps blocked records, and never
+ranks scores across baseline variants. [中文操作](profiles-and-baselines.zh-CN.md).

@@ -1,6 +1,6 @@
 # 自动选峰与峰数判断
 
-[中文首页](../README.zh-CN.md) · [完整使用指南](usage.zh-CN.md) · [方法公式与参考](automatic.md) · [实测验证](real-validation.zh-CN.md)
+[中文首页](../README.zh-CN.md) · [完整使用指南](usage.zh-CN.md) · [方法公式与参考](automatic.md) · [实测验证](real-validation.zh-CN.md) · [基线和峰型](profiles-and-baselines.zh-CN.md)
 
 ## 使用方式
 
@@ -11,7 +11,7 @@
   "input": {"path": "data/spectrum.xlsx", "header": null, "x": 0, "y": 1},
   "baseline": {"method": "asls", "lam": 1000000, "p": 0.01, "iterations": 30, "resample": true},
   "fit": {
-    "auto": {"max_peaks": 5, "criterion": "bic", "delta_threshold": 6, "multistarts": 3},
+    "auto": {"shapes": ["gaussian", "lorentzian", "voigt"], "max_peaks": 5, "criterion": "bic", "delta_threshold": 6, "multistarts": 3},
     "max_nfev": 3000
   },
   "data_kind": "measurement"
@@ -35,7 +35,7 @@ raman-analyze --lang zh demo-batch --automatic --scenario crossing --output runs
 1. 使用声明的基线和拟合范围。零峰模型是线性残余背景，也是必须比较的候选。
 2. 由一阶差分的 MAD 估计噪声尺度；它只是启发式估计，不会冒充用户提供的测量误差。
 3. 在用于提出初值的平滑信号上寻找具有突出度的局部峰，并把宽度转换到实际横坐标单位。
-4. 对 1–N 个正 Gaussian 组分分别进行有界拟合；初值来自检测、前一模型未解释的残差或宽组分拆分。默认最多保留 32 个检测提议，每个峰数进行 3 次局部初始化尝试。
+4. 对每种请求的峰型及 1–N 个正组分分别进行有界拟合；初值来自检测、前一模型未解释的残差或宽组分拆分。默认最多保留 32 个检测提议，每个峰数进行 3 次局部初始化尝试。
 5. 所有模型都拟合相同的原始采样点，并含有线性残余背景。平滑谱不参与最终拟合，不增加样本量。
 6. 对成功收敛的候选比较 BIC 或 AICc。保存代价、竞争峰数、初值、每次优化的状态和拟合诊断。
 
@@ -45,13 +45,14 @@ raman-analyze --lang zh demo-batch --automatic --scenario crossing --output runs
 
 | 字段 | 默认值 | 含义 |
 |---|---:|---|
+| `shapes` | `["gaussian"]` | 请求比较的峰型；可用 `gaussian`、`lorentzian`、`voigt`，不能重复 |
 | `max_peaks` | 5 | 比较 0 到此上限；范围 1–8 |
 | `criterion` | `bic` | `bic` 或 `aicc`，越小越优 |
 | `delta_threshold` | 6 | 距最小代价在此范围内的峰数均保留；不是置信概率 |
 | `prominence_snr` | 4 | 检测突出度相对噪声尺度的阈值，同时检查选中组分的幅度 |
 | `smooth_sigma_points` | 1.5 | 提议阶段的 Gaussian 平滑尺度，单位为采样点；0 关闭 |
-| `min_sigma_cm1` | 中位横坐标间距 | 组分 sigma 下限；可明确指定正值 |
-| `max_sigma_cm1` | 拟合跨度 / 3 | 组分 sigma 上限；可明确指定正值 |
+| `min_sigma_cm1` | 中位横坐标间距 | 等效 Gaussian sigma 下限；非 Gaussian 峰的总 FWHM 分辨率检查按同一区间换算 |
+| `max_sigma_cm1` | 拟合跨度 / 3 | 等效 Gaussian sigma 上限；可明确指定正值 |
 | `min_separation_cm1` | 中位间距的两倍 | 检测与选中组分的最小间距检查，不能替代仪器分辨率 |
 | `multistarts` | 3 | 每个峰数的初始化尝试次数，1–12 |
 
@@ -61,7 +62,9 @@ raman-analyze --lang zh demo-batch --automatic --scenario crossing --output runs
 
 先打开每条谱的 `model-selection.html`，直接比较各峰数的代价和诊断；批处理总览中也有链接。
 
-- `report.json` 的 `model_selection.selected_peak_count` 是当前代价最小的候选。
+- `report.json` 的 `model_selection.selected_peak_count` 是当前代价最小的候选，`selected_shape` 保存其峰型。
+- `shape_comparison` 保留各峰型内部的最佳峰数；若不同，`shape_count_stability` 为 SENSITIVE，最终判断为 INCONCLUSIVE。
+- `shape-comparison.csv` 保留每种峰型最佳曲线；开启绘图时，另保存三峰型 PNG/PDF 对照。
 - `plausible_peak_counts` 保存代价差在阈值内的候选峰数，不是概率区间。
 - `count_status` 同时考虑选中模型的拟合诊断和峰数判断问题。为 INCONCLUSIVE 时，不能把最佳候选当作已确认峰数。
 - `model-selection.csv` 方便比较各峰数的 BIC、AICc、参数数目、代价差和拟合状态。
@@ -73,10 +76,10 @@ raman-analyze --lang zh demo-batch --automatic --scenario crossing --output runs
 
 ## 在真实数据中必须复核什么
 
-荧光背景、仪器尖峰、负向异常、非 Gaussian 线型和重叠峰都可能被额外组分吸收。较低的 BIC 不证明发现了更多物理振动模式。
+荧光背景、仪器尖峰、负向异常、不匹配或非对称线型和重叠峰都可能被额外组分吸收。较低的 BIC 不证明发现了更多物理振动模式。
 建议比较合理的基线、窗口和宽度范围，检查判断是否稳定，并保留所有运行。
 
-AsLS 默认要求近似均匀采样。显式 `resample:true` 只在基线估计阶段构造同样点数的均匀网格，再映射回原始坐标。原始谱的拟合和导出不被重采样；基线不确定性仍不包含在局部协方差内。
+AsLS/arPLS 默认要求近似均匀采样。显式 `resample:true` 只在基线估计阶段构造同样点数的均匀网格，再映射回原始坐标。原始谱的拟合和导出不被重采样；基线不确定性仍不包含在局部协方差内。
 
 目前已用真实压力光谱开展本地适用性检查；没有独立人工或仪器参考峰数标签，因此不能报告真实峰数准确率。
 合成真值检查、真实数据可运行、模型诊断通过、物理峰数正确是不同层次的证据。
