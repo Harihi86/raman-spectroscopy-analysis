@@ -4,13 +4,25 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "raman-spectroscopy-analysis"
-version = "0.1.0"
-description = "Raman spectroscopy analysis"
+version = "0.2.0"
+description = "Manifest-based Raman spectrum fitting and pressure-aware peak tracking"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
 authors = [{name = "Harihi86"}]
-dependencies = ["numpy>=1.26,<3", "scipy>=1.12,<2", "matplotlib>=3.8,<4", "pandas>=2.2,<3", "openpyxl>=3.1,<4"]
+dependencies = [
+    "numpy>=1.26,<3",
+    "scipy>=1.12,<2",
+    "matplotlib>=3.8,<4",
+    "pandas>=2.2,<3",
+    "openpyxl>=3.1,<4",
+    "jsonschema>=4.22,<5",
+]
+
+[project.urls]
+Repository = "https://github.com/Harihi86/raman-spectroscopy-analysis"
+Documentation = "https://github.com/Harihi86/raman-spectroscopy-analysis/blob/main/README.zh-CN.md"
+Issues = "https://github.com/Harihi86/raman-spectroscopy-analysis/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "ruff>=0.12,<1", "build>=1,<2"]
@@ -20,6 +32,9 @@ raman-analyze = "raman_analysis.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+raman_analysis = ["schemas/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

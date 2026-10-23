@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Raman tracking settings",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "enabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "prediction": {
+      "enum": [
+        "linear",
+        "nearest"
+      ],
+      "default": "linear"
+    },
+    "max_distance_cm1": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "default": 20
+    },
+    "ambiguity_margin_cm1": {
+      "type": "number",
+      "minimum": 0,
+      "default": 1
+    },
+    "max_gap": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 50,
+      "default": 1
+    },
+    "width_weight": {
+      "type": "number",
+      "minimum": 0,
+      "default": 0
+    }
+  }
+}

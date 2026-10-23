@@ -2,10 +2,14 @@
 
 import hashlib
 from dataclasses import dataclass
+from io import BytesIO
 from pathlib import Path
+from xml.etree.ElementTree import ParseError
+from zipfile import BadZipFile
 
 import numpy as np
 import pandas as pd
+from openpyxl.utils.exceptions import InvalidFileException
 
 
 @dataclass(frozen=True)
@@ -28,6 +32,7 @@ def load_spectrum(
     units="cm^-1",
 ):
     path = Path(path)
+    raw_input = path.read_bytes()
     if units != "cm^-1":
         raise ValueError(
             "The supported spectral-axis unit is cm^-1; convert wavelengths explicitly"
@@ -35,12 +40,15 @@ def load_spectrum(
     if missing not in {"error", "drop"}:
         raise ValueError("missing must be error or drop")
     if path.suffix.lower() == ".xlsx":
-        frame = pd.read_excel(path, sheet_name=sheet)
+        try:
+            frame = pd.read_excel(BytesIO(raw_input), sheet_name=sheet, engine="openpyxl")
+        except (BadZipFile, InvalidFileException, ParseError) as exc:
+            raise ValueError("Cannot read XLSX workbook: corrupt or unsupported contents") from exc
     elif path.suffix.lower() in {".csv", ".tsv", ".txt"}:
         sep = (
             delimiter if delimiter is not None else ("\t" if path.suffix.lower() == ".tsv" else ",")
         )
-        frame = pd.read_csv(path, sep=sep)
+        frame = pd.read_csv(BytesIO(raw_input), sep=sep)
     else:
         raise ValueError("Supported formats: CSV, TSV, delimited TXT and XLSX, with a header row")
 
@@ -79,7 +87,7 @@ def load_spectrum(
         errors,
         {
             "input_name": path.name,
-            "input_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            "input_sha256": hashlib.sha256(raw_input).hexdigest(),
             "units": units,
             "x_column": x,
             "y_column": y,

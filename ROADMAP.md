@@ -2,17 +2,18 @@
 
 | Priority / status | Objective and expected behavior | Dependencies | Acceptance criteria / verification |
 |---|---|---|---|
-| P0 / Implemented | Remove implicit layout, pressure and missing-value assumptions from supported API | Explicit tabular schema | CSV/XLSX import, unit checks, duplicate rejection, opt-in missing rows and raw-preservation tests |
-| P0 / Implemented | Fail clearly on optimizer uncertainty | Bounded least squares and diagnostics | Nonconvergence remains FAIL; rank/bound concerns remain INCONCLUSIVE; no maximum fallback |
-| P0 / Planned | Validate real spectra and legacy migrations | Releasable data and instrument metadata | Curated measurement references reproduce approved fits; migrate deprecated integration calls with regression checks |
-| P1 / Implemented | Configurable Gaussian count, baseline, numerical/figure exports | SciPy/NumPy and explicit configuration | Known 1/2/3-peak analytical fixtures and weighted local covariance tests |
-| P1 / Planned | Batch manifests and pressure peak tracking | Per-spectrum provenance and explicit acquisition IDs | Missing/duplicate pressures do not reorder identity; synthetic crossings and heating labels tested |
-| P1 / Planned | Shared-axis/pair-axis loaders and robust measurement diagnostics | Documented format schemas | Ambiguous files rejected; invalid/cosmic-ray/saturated data flagged without silent modification |
-| P2 / Planned | Baseline/calibration uncertainty and model diagnostics | Calibrated errors and alternative baselines | Bootstrap coverage checked on seeded simulations; sensitivity to fit windows, baseline and peak count reported |
-| P2 / Planned | Voigt/Lorentzian models and model selection | Validated line profiles and scoring rules | Analytical limiting cases, identifiability checks and held-out synthetic comparisons |
-| P2 / Planned | Waterfalls, heatmaps and pressure trends | Batch metadata and tested peak tracking | No unlabelled interpolation or zero fill; observed and interpolated values visibly distinct |
-| P3 / Experimental | Automated scientific reports and heating comparisons | Validated pressure series, provenance and domain review | Reports separate measurements, fits and interpretations; no automatic phase identification |
+| P0 / Implemented | Explicit imports and input provenance without experiment profiles | Tabular input schema | Unit/duplicate checks, opt-in invalid rows, immutable raw inputs and parsed-byte hashes |
+| P0 / Implemented | Preserve failed or unidentifiable fits | Bounded least squares and diagnostics | Nonconvergence, affine spectra, covariance/bound/residual concerns remain visible |
+| P1 / Implemented | Batch manifests and independent pressure-series tracking | Per-spectrum API, JSON Schema, global assignment | Repeated/missing/decreasing pressures, births/gaps/crossings, partial batches and exhaustive assignment oracle |
+| P1 / Implemented | Usable bilingual delivery | CLI, result artifacts and documented settings | Chinese help/README/guide, offline HTML index, CSV/JSON, complete synthetic demonstrations and saved-fit retracking |
+| P0 / Planned | Validate authorized measured spectra and migrate legacy integration safely | Releasable data and instrument metadata | Reproduce approved references; migrate deprecated NumPy integration with matched regression checks |
+| P1 / Planned | Validated instrument loaders and data-quality diagnostics | Actual format specifications | Shared/pair layouts explicitly described; cosmic-ray/saturation flags without silent edits |
+| P2 / Planned | Baseline/calibration uncertainty and model diagnostics | Calibrated errors and alternative baselines | Bootstrap coverage checked on seeded simulations and authorized references |
+| P2 / Planned | Voigt/Lorentzian models and explicit model selection | Validated line profiles and scoring rules | Analytical limits, identifiability tests and held-out comparisons |
+| P2 / Planned | Reviewed annotations and safer difficult-trajectory handling | Saved candidate identities and scientific review | Explicit manual anchors, uncertainty assessment and robustness against non-linear shifts; no claimed calibrated probability without evidence |
+| P2 / Planned | Resume interrupted batches and scale reporting | Stable journals and input/configuration hashes | Reuse only matching completed artifacts; changed inputs cannot inherit stale success |
+| P3 / Experimental | Waterfalls, heatmaps and automated scientific reports | Validated batch metadata and measurement references | Observed/interpolated quantities distinguished; no automatic phase identification |
 
-Next milestone: a small batch-manifest API with synthetic pressure-series tests,
-followed by authorized measured-spectrum validation. A repository-ready core is
-not a claim of universal spectroscopy capability.
+The 0.2 milestone completes the first batch/tracking workflow and Chinese user
+materials. The next scientific milestone is reference validation on authorized
+measurements, with model/uncertainty work guided by observed limitations.

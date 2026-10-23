@@ -1,144 +1,185 @@
 # Raman Spectroscopy Analysis
 
-Reproducible scientific Python analysis of tabular Raman spectra. This project
-continues an owner-authored high-pressure Raman analysis program, **SHproject**,
-while separating its experiment-specific settings from a configurable public API.
-It is independent of the φ³ theoretical-physics project.
+[![checks](https://github.com/Harihi86/raman-spectroscopy-analysis/actions/workflows/ci.yml/badge.svg)](https://github.com/Harihi86/raman-spectroscopy-analysis/actions/workflows/ci.yml)
 
-**Implemented:** explicit CSV/TSV/TXT/XLSX column imports, missing-value policy,
-unit and duplicate-axis validation, AsLS or reference-region polynomial baseline
-estimation, bounded one-to-eight Gaussian fits with linear residual background,
-local parameter covariance, FWHM/area uncertainties, residuals and numerical/figure
-exports. Pressure metadata is optional; no pressure table or sample identity is
-required to analyze an individual spectrum.
+[English](README.md) · [简体中文](README.zh-CN.md) · [中文使用指南](docs/usage.zh-CN.md)
 
-**Verified demonstration:** a seeded, explicitly synthetic two-peak spectrum.
-The example is a software validation case, not an experimental observation or a
-physical identification. It does not establish performance on all Raman materials.
+**Version 0.2** — a reproducible command-line tool for individual Raman spectra,
+manifest-based batches and peak tracking across pressure acquisitions. It extends
+the owner-authored SHproject source with configurable, independently tested APIs.
+No experiment profile, fixed pressure table or sample-specific window is imported
+by the supported pipeline.
 
-![Generated synthetic spectrum and residuals](docs/synthetic-spectrum.png)
+## What you can do
 
-## Scientific background and legacy source
+- Read explicit columns from CSV, TSV, delimited TXT and XLSX; keep original inputs intact.
+- Estimate an AsLS or reference-region polynomial baseline and fit 1–8 Gaussian peaks.
+- Process spectra with shared defaults and per-spectrum overrides; save each failure independently.
+- Track accepted fitted peaks within independently named series, in acquisition order.
+- Preserve repeated/decreasing pressures, missing metadata, peak births/disappearances and gaps.
+- Use pressure-linear predictions and global assignment; retain ambiguous identities without forcing labels.
+- Open an offline bilingual HTML result index, numerical tables, figures and detailed JSON reports.
+- Recompute tracking settings from saved fits without rerunning the spectral optimizer.
+- Use Chinese help and console output; CSV summaries include a UTF-8 BOM for spreadsheet compatibility.
 
-The original program was developed for pressure-dependent Raman and photoactivity
-comparisons. Its source contains fixed pressure lists, named experiment profiles,
-measurement-window choices and pressure-conditional plotting rules. Those are
-specific analysis decisions rather than universal properties of Raman spectra.
+The public examples are **synthetic**. Track IDs are algorithmic continuity
+labels, not chemical or vibrational-mode identifications.
 
-[Preserved SHproject source](legacy/SHproject) retains the processing modules and
-command-line scripts. Historical experimental profiles are replaced by public
-templates. Raw measurements, old figures, run logs and duplicate archives are
-excluded pending separate data-publication review. [The source audit](docs/legacy-audit.md)
-records concrete restrictions and which ones the new API addresses.
+## Install
 
-No claim is made that the experimental material was synthesized during compression,
-or that any fitted band proves a phase transition or chemical identity.
-
-## Installation and quick start
-
-Requires Python 3.11 or newer.
+Python 3.11 or newer. Install into a virtual environment from this repository:
 
 ```bash
 python -m venv .venv
-# Activate the environment using your platform's normal command.
-python -m pip install ".[dev]"
-raman-analyze demo --output runs/demo
+# macOS / Linux
+source .venv/bin/activate
+python -m pip install .
 ```
 
-The demo writes `synthetic.csv`, the random seed and ground truth, `config.json`,
-and an `analysis/` directory containing raw/corrected spectral columns, fitted
-curves, Gaussian components, residuals, peak parameters, a JSON report, PNG/PDF
-figures and artifact hashes. Use a new output directory for each run.
+On Windows PowerShell, activation is optional:
 
-## Analyze your own spectrum
+```powershell
+py -3.12 -m venv .venv
+.venv\Scripts\python.exe -m pip install .
+.venv\Scripts\python.exe -m raman_analysis.cli --lang zh --help
+```
 
-Create a header-based CSV with `shift_cm1` and `intensity` columns, or specify
-column names/zero-based indices explicitly. Relative paths resolve against the
-configuration file's directory, not the shell's working directory.
+Runtime dependencies are declared in `pyproject.toml`. The current validated
+runtime versions are recorded in `requirements-demo.txt`; other supported
+platforms resolve the declared version ranges.
+
+## Try a complete batch
+
+```bash
+raman-analyze --lang zh demo-batch --output runs/first-batch
+raman-analyze demo-batch --scenario crossing --output runs/crossing
+```
+
+Open `runs/first-batch/analysis/report.html` locally. The first example fits
+11 generated spectra in two independent sweeps, including repeated and decreasing
+pressures. The crossing example fits six generated spectra and checks continuity
+when the frequency ordering of two trajectories reverses. Demonstration fitting
+priors are explicit and informed by the synthetic construction; this is not a
+benchmark of blind peak discovery.
+
+![Generated synthetic pressure trajectories](docs/crossing-tracks.png)
+
+## Analyze your own batch
+
+A complete [portable synthetic batch](examples/batch) includes its manifest, CSV inputs and truth table.
+
+Create a manifest. Each spectrum has a stable ID, an input path and optional
+pressure/series metadata. Paths resolve relative to the manifest file.
 
 ```json
 {
+  "schema_version": 1,
   "data_kind": "measurement",
-  "input": {
-    "path": "spectrum.csv",
-    "x": "shift_cm1",
-    "y": "intensity",
-    "units": "cm^-1",
-    "missing": "error"
+  "defaults": {
+    "input": {"x": "shift_cm1", "y": "intensity", "units": "cm^-1"},
+    "baseline": {"method": "none"},
+    "fit": {"peaks": [{"center": 350, "sigma": 20}, {"center": 720, "sigma": 30}]}
   },
-  "baseline": {"method": "asls", "lam": 1000000, "p": 0.01, "iterations": 30},
-  "fit": {
-    "window": [100, 1100],
-    "peaks": [{"center": 350, "sigma": 20}, {"center": 720, "sigma": 30}]
-  }
+  "tracking": {
+    "prediction": "linear",
+    "max_distance_cm1": 20,
+    "ambiguity_margin_cm1": 1,
+    "max_gap": 1
+  },
+  "spectra": [
+    {"id": "s01", "series": "sample-a", "pressure_gpa": 0, "input": {"path": "data/s01.csv"}},
+    {"id": "s02", "series": "sample-a", "pressure_gpa": 1, "input": {"path": "data/s02.csv"}}
+  ]
 }
 ```
 
+These numerical seeds and tracking thresholds are illustrative. Choose them for
+the actual data and resolution. A peak model is an explicit scientific input;
+the program does not select every material's lineshape or peak count automatically.
+
 ```bash
-raman-analyze run config.json --output runs/measurement-01
+raman-analyze validate manifest.json --check-files
+raman-analyze batch manifest.json --output runs/batch-01
+raman-analyze track runs/batch-01/batch-report.json --settings tracking.json --output runs/retracked
 ```
 
-For XLSX, set `path` to the workbook and optionally `sheet` in `input`.
-TXT is delimited text with a header; set `delimiter` explicitly if needed.
-A `sigma` column supplies positive measurement standard deviations for absolute
-weighted covariance. Unknown/missing data are not silently filled. Duplicate axis
-values require a preprocessing decision outside this API; a descending axis is
-sorted and recorded. The input file is never rewritten.
+Use a new output directory for each run. `--no-figures` keeps the numerical and
+HTML outputs while disabling figure generation. Add `--json` for machine-readable
+console summaries; progress is written to stderr.
 
-## Methodology and uncertainty
+[Manifest and output reference](docs/configuration.md) · [Tracking method](docs/tracking.md)
+· [中文常见问题](docs/troubleshooting.zh-CN.md).
 
-The baseline is estimated separately and exported. AsLS assumes positive peaks
-and approximately uniform sampling because its curvature penalty acts on sample
-indices. Irregular sampling requires a different baseline method or an explicit,
-separately documented resampling step. Polynomial baselines require user-chosen
-reference `regions`; `none` performs no baseline subtraction.
+## Results and quality states
 
-Fits minimize squared residuals with Gaussian peaks and a linear residual
-background. Peak counts, seeds and optional `center_bounds`/`sigma_bounds` are
-explicit. Nonconvergence yields `FAIL`, while rank deficiency, poor conditioning
-active bounds, strongly correlated residuals or excessive residual/noise mismatch yield `INCONCLUSIVE`. Neither falls back to an unlabelled maximum.
+`report.html` links per-spectrum raw/corrected data, fit parameters, residuals and
+diagnostics. `summary.csv` preserves acquisition IDs and pressures;
+`tracking/assignments.csv` preserves every accepted, ambiguous or excluded peak
+and explicit gaps. Empty pressures are not replaced with invented values.
 
-Local covariance uses the fit Jacobian, scaled by residual variance when absolute
-measurement errors are absent. The area error includes amplitude/width covariance;
-FWHM is `2 sqrt(2 ln 2) sigma`. Uncertainties are conditional on the baseline/model
-and omit baseline-estimation, calibration and model-selection uncertainty.
-See [method and limitations](docs/methodology.md).
+| State | Interpretation |
+|---|---|
+| PASS | Configured numerical/assignment criteria passed |
+| FAIL | A numerical fit did not pass |
+| INCONCLUSIVE | Partial results, unresolved fit diagnostics or assignment ambiguity |
+| BLOCKED | An input/configuration prevented analysis |
+| NOT_RUN | Tracking was explicitly disabled or a run is not yet evaluated |
 
-## Tests and validation
+A bad file does not discard successful spectra. Batch status never reports PASS
+when a requested fit or tracking result remains unresolved. An interruption leaves
+`run.json` and flushed `spectra.jsonl` records; an incomplete batch is not accepted
+for retracking. Automatic resume is not implemented.
+
+## Single spectra and uncertainty
+
+The original supported single-spectrum interface remains available:
 
 ```bash
+raman-analyze demo --output runs/single-example
+raman-analyze run examples/synthetic/config.json --output runs/single-fit
+```
+
+AsLS requires approximately uniform sampling. Fits use positive Gaussians with a
+linear residual background. Covariance, FWHM and area errors are local estimates
+conditional on a fixed baseline and selected model. Baseline/calibration/model
+uncertainty is not included. Failed or unidentifiable fits do not update tracks.
+See [spectral methodology](docs/methodology.md).
+
+## Verification and scope
+
+```bash
+python -m pip install ".[dev]"
 python -m pytest -q
 python -m ruff check src tests
 python -m ruff format --check src tests
 python -m build
 ```
 
-Tests cover known one-/two-/three-peak models, weighted covariance, nonconvergence,
-flat/irregular baselines, invalid imports, CSV/XLSX, raw preservation and comparison
-with the preserved AsLS implementation on a nonflat fixture. The synthetic demo
-checks recovery of its known peak centers. [Observed results](docs/validation.md)
-distinguish supported API checks from the unvalidated historical workflows.
+Tests cover analytical spectra, cross-platform fit failures, manifest validation,
+partial batches, interruption records, retracking, independent series, crossings,
+missing/duplicate pressures and an exhaustive small assignment oracle. CI runs on
+Linux/Windows with Python 3.11/3.12. [Observed validation](docs/validation.md).
 
-## Known limitations and roadmap
+Current scope: explicit Gaussian models, header-based tabular inputs and local
+serial batches of up to 10,000 entries. Non-Gaussian models, automatic peak/model
+selection, calibrated tracking probabilities, bootstrap uncertainty, instrument
+formats and authorized measured-spectrum validation remain future work.
 
-The supported pipeline analyzes one spectrum per invocation. Batch manifests,
-peak tracking across pressure, Voigt/Lorentzian lineshapes, cosmic-ray handling,
-bootstrap baseline uncertainty, automatic model selection, heatmaps/waterfalls,
-laser-heating comparisons and report automation are **planned**. Historical
-versions of some of these functions remain in the experimental legacy modules;
-they are not thereby validated as a general API.
+## Source, roadmap and references
 
-[Prioritized roadmap](ROADMAP.md). Real measurements and physical interpretations
-need their own provenance, permissions, calibration and scientific assessment.
+[Preserved SHproject processing source](legacy/SHproject) is experimental legacy
+code, with experiment profiles replaced by public templates. It is not imported
+by the new batch/tracking API. Raw experimental spreadsheets, historical figures,
+run logs and private profiles are excluded. [Source audit](docs/legacy-audit.md).
 
-## References and license
+[Roadmap](ROADMAP.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md)
+· [Publication scope](docs/publication.md).
 
-- Eilers and Boelens (2005), *Baseline Correction with Asymmetric Least Squares Smoothing*:
-  [primary method report](https://prod-dcd-datasets-public-files-eu-west-1.s3.eu-west-1.amazonaws.com/dd7c1919-302c-4ba0-8f88-8aa61e86bb9d).
-- SciPy [nonlinear fitting and covariance documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html)
-  and [least_squares](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html).
-- [PyPA packaging guide](https://packaging.python.org/en/latest/tutorials/packaging-projects/).
+References: [Eilers–Boelens AsLS method report](https://prod-dcd-datasets-public-files-eu-west-1.s3.eu-west-1.amazonaws.com/dd7c1919-302c-4ba0-8f88-8aa61e86bb9d),
+[SciPy least_squares](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html),
+[SciPy linear_sum_assignment](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linear_sum_assignment.html),
+[jsonschema validation](https://python-jsonschema.readthedocs.io/en/stable/validate/).
 
 MIT licensed original software. The software license does not grant rights to
-unreleased experimental data. The included synthetic arrays are generated by the
-example code. [Publication scope](docs/publication.md).
+unreleased measurements or external literature. This repository is independent
+of the φ³ theoretical-physics project.

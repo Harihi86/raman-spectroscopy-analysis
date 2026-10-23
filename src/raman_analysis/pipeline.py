@@ -11,12 +11,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from . import __version__
 from .baseline import estimate_baseline
 from .fitting import fit_peaks
 from .io import load_spectrum
 
 
-def analyze(config, output: Path, *, base: Path = Path(".")):
+def analyze(config, output: Path, *, base: Path = Path("."), save_figures: bool = True):
     if set(config) - {"input", "baseline", "fit", "data_kind", "metadata"}:
         raise ValueError("Unknown top-level configuration field")
     data_kind = config.get("data_kind", "unspecified")
@@ -49,6 +50,7 @@ def analyze(config, output: Path, *, base: Path = Path(".")):
     summary.update(
         {
             "data_kind": data_kind,
+            "program_version": __version__,
             "provenance": spectrum.provenance,
             "baseline": baseline_config,
             "fit_configuration": config["fit"],
@@ -84,6 +86,18 @@ def analyze(config, output: Path, *, base: Path = Path(".")):
     for i, component in enumerate(fit["components"]):
         fit_frame[f"gaussian_{i + 1}"] = component
     pd.DataFrame(fit_frame).to_csv(output / "fit.csv", index=False)
+    if save_figures:
+        plot_spectrum(spectrum, baseline, corrected, selection, fit, data_kind, output)
+    manifest = {
+        p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in sorted(output.iterdir())
+        if p.is_file()
+    }
+    (output / "artifacts.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    return summary
+
+
+def plot_spectrum(spectrum, baseline, corrected, selection, fit, data_kind, output):
     fig, axes = plt.subplots(
         3,
         1,
@@ -123,10 +137,3 @@ def analyze(config, output: Path, *, base: Path = Path(".")):
     fig.savefig(output / "spectrum.png", dpi=180)
     fig.savefig(output / "spectrum.pdf")
     plt.close(fig)
-    manifest = {
-        p.name: hashlib.sha256(p.read_bytes()).hexdigest()
-        for p in sorted(output.iterdir())
-        if p.is_file()
-    }
-    (output / "artifacts.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    return summary

@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "data_kind": "synthetic",
+  "defaults": {
+    "input": {
+      "sigma": "noise_sd"
+    },
+    "baseline": {
+      "method": "none"
+    }
+  },
+  "outputs": {
+    "per_spectrum_figures": false,
+    "tracking_figures": true
+  },
+  "tracking": {
+    "prediction": "linear",
+    "max_distance_cm1": 80,
+    "ambiguity_margin_cm1": 1,
+    "max_gap": 1
+  },
+  "metadata": {
+    "seed": 20261023,
+    "scenario": "crossing",
+    "purpose": "synthetic software validation; not experimental data",
+    "fit_initialization": "explicit demonstration priors near generated peaks; not blind peak discovery"
+  },
+  "spectra": [
+    {
+      "id": "crossing-001",
+      "series": "crossing",
+      "pressure_gpa": 0.0,
+      "input": {
+        "path": "data/crossing-001.csv"
+      },
+      "analysis": {
+        "fit": {
+          "peaks": [
+            {
+              "center": 262.0,
+              "sigma": 10.8
+            },
+            {
+              "center": 622.0,
+              "sigma": 18.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "crossing-002",
+      "series": "crossing",
+      "pressure_gpa": 1.0,
+      "input": {
+        "path": "data/crossing-002.csv"
+      },
+      "analysis": {
+        "fit": {
+          "peaks": [
+            {
+              "center": 322.0,
+              "sigma": 10.8
+            },
+            {
+              "center": 562.0,
+              "sigma": 18.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "crossing-003",
+      "series": "crossing",
+      "pressure_gpa": 2.0,
+      "input": {
+        "path": "data/crossing-003.csv"
+      },
+      "analysis": {
+        "fit": {
+          "peaks": [
+            {
+              "center": 382.0,
+              "sigma": 10.8
+            },
+            {
+              "center": 502.0,
+              "sigma": 18.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "crossing-004",
+      "series": "crossing",
+      "pressure_gpa": 4.0,
+      "input": {
+        "path": "data/crossing-004.csv"
+      },
+      "analysis": {
+        "fit": {
+          "peaks": [
+            {
+              "center": 502.0,
+              "sigma": 10.8
+            },
+            {
+              "center": 382.0,
+              "sigma": 18.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "crossing-005",
+      "series": "crossing",
+      "pressure_gpa": 5.0,
+      "input": {
+        "path": "data/crossing-005.csv"
+      },
+      "analysis": {
+        "fit": {
+          "peaks": [
+            {
+              "center": 562.0,
+              "sigma": 10.8
+            },
+            {
+              "center": 322.0,
+              "sigma": 18.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "crossing-006",
+      "series": "crossing",
+      "pressure_gpa": 6.0,
+      "input": {
+        "path": "data/crossing-006.csv"
+      },
+      "analysis": {
+        "fit": {
+          "peaks": [
+            {
+              "center": 622.0,
+              "sigma": 10.8
+            },
+            {
+              "center": 262.0,
+              "sigma": 18.0
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

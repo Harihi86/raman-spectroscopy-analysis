@@ -1,0 +1,59 @@
+{
+  "data_kind": "synthetic",
+  "spectra": [
+    {
+      "spectrum_id": "crossing-001",
+      "series": "crossing",
+      "pressure_gpa": 0.0,
+      "centers_in_physical_branch_order_cm1": [
+        260.0,
+        620.0
+      ]
+    },
+    {
+      "spectrum_id": "crossing-002",
+      "series": "crossing",
+      "pressure_gpa": 1.0,
+      "centers_in_physical_branch_order_cm1": [
+        320.0,
+        560.0
+      ]
+    },
+    {
+      "spectrum_id": "crossing-003",
+      "series": "crossing",
+      "pressure_gpa": 2.0,
+      "centers_in_physical_branch_order_cm1": [
+        380.0,
+        500.0
+      ]
+    },
+    {
+      "spectrum_id": "crossing-004",
+      "series": "crossing",
+      "pressure_gpa": 4.0,
+      "centers_in_physical_branch_order_cm1": [
+        500.0,
+        380.0
+      ]
+    },
+    {
+      "spectrum_id": "crossing-005",
+      "series": "crossing",
+      "pressure_gpa": 5.0,
+      "centers_in_physical_branch_order_cm1": [
+        560.0,
+        320.0
+      ]
+    },
+    {
+      "spectrum_id": "crossing-006",
+      "series": "crossing",
+      "pressure_gpa": 6.0,
+      "centers_in_physical_branch_order_cm1": [
+        620.0,
+        260.0
+      ]
+    }
+  ]
+}
