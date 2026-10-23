@@ -30,9 +30,16 @@ def load_spectrum(
     delimiter=None,
     missing="error",
     units="cm^-1",
+    header=0,
 ):
     path = Path(path)
     raw_input = path.read_bytes()
+    if header is not None and (type(header) is not int or header < 0):
+        raise ValueError("header must be null or a nonnegative row index")
+    if header is None and any(
+        type(key) is not int for key in (x, y, *([sigma] if sigma is not None else []))
+    ):
+        raise ValueError("Headerless inputs require integer column indices")
     if units != "cm^-1":
         raise ValueError(
             "The supported spectral-axis unit is cm^-1; convert wavelengths explicitly"
@@ -41,16 +48,20 @@ def load_spectrum(
         raise ValueError("missing must be error or drop")
     if path.suffix.lower() == ".xlsx":
         try:
-            frame = pd.read_excel(BytesIO(raw_input), sheet_name=sheet, engine="openpyxl")
+            frame = pd.read_excel(
+                BytesIO(raw_input), sheet_name=sheet, engine="openpyxl", header=header
+            )
         except (BadZipFile, InvalidFileException, ParseError) as exc:
             raise ValueError("Cannot read XLSX workbook: corrupt or unsupported contents") from exc
     elif path.suffix.lower() in {".csv", ".tsv", ".txt"}:
         sep = (
             delimiter if delimiter is not None else ("\t" if path.suffix.lower() == ".tsv" else ",")
         )
-        frame = pd.read_csv(BytesIO(raw_input), sep=sep)
+        frame = pd.read_csv(BytesIO(raw_input), sep=sep, header=header)
     else:
-        raise ValueError("Supported formats: CSV, TSV, delimited TXT and XLSX, with a header row")
+        raise ValueError(
+            "Supported formats: CSV, TSV, delimited TXT and XLSX; declare the header explicitly"
+        )
 
     def column(key):
         values = frame.iloc[:, key] if type(key) is int else frame[key]
@@ -88,6 +99,7 @@ def load_spectrum(
         {
             "input_name": path.name,
             "input_sha256": hashlib.sha256(raw_input).hexdigest(),
+            "header": header,
             "units": units,
             "x_column": x,
             "y_column": y,

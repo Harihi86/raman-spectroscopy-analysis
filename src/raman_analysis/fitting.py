@@ -12,6 +12,21 @@ def gaussian(x, amplitude, center, sigma):
     return amplitude * np.exp(-0.5 * ((x - center) / sigma) ** 2)
 
 
+def model_jacobian(x, params, peak_count, errors=None):
+    """Analytic derivatives in input-peak order, followed by intercept/slope."""
+    jac = np.empty((len(x), 3 * peak_count + 2))
+    for i in range(peak_count):
+        amplitude, center, sigma = params[3 * i : 3 * i + 3]
+        z = (x - center) / sigma
+        shape = np.exp(-0.5 * z**2)
+        jac[:, 3 * i] = shape
+        jac[:, 3 * i + 1] = amplitude * shape * z / sigma
+        jac[:, 3 * i + 2] = amplitude * shape * z**2 / sigma
+    jac[:, -2] = 1
+    jac[:, -1] = x - np.mean(x)
+    return jac if errors is None else jac / errors[:, None]
+
+
 def fit_peaks(x, y, peaks, *, errors=None, max_nfev=10000, residual_correlation_limit=0.35):
     x, y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
     if x.ndim != 1 or x.shape != y.shape or len(x) < 8 or not np.isfinite([x, y]).all():
@@ -81,7 +96,13 @@ def fit_peaks(x, y, peaks, *, errors=None, max_nfev=10000, residual_correlation_
         return r if errors is None else r / errors
 
     result = least_squares(
-        residual, initial, bounds=(lower, upper), max_nfev=max_nfev, x_scale="jac", loss="linear"
+        residual,
+        initial,
+        jac=lambda params: model_jacobian(x, params, len(peaks), errors),
+        bounds=(lower, upper),
+        max_nfev=max_nfev,
+        x_scale="jac",
+        loss="linear",
     )
     fitted = model(result.x)
     residuals = y - fitted

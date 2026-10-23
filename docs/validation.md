@@ -1,5 +1,30 @@
 # Observed validation / 验证记录
 
+Date: 2026-10-23. Version: 0.3.0. Local host: macOS arm64, CPython 3.12.0.
+
+- Full suite: **104 passed**, no failures/errors/skips.
+- Wheel/source archive built successfully; a fresh virtual environment installed the wheel, ran the automatic crossing demo and manifest validation, and passed saved-score/hash checks and `pip check`.
+- Ruff check/format for source, tests and tools: PASS.
+- Automatic detection fixtures cover zero to three peaks without truth-informed seeds, overlapping peaks, known heteroscedastic errors, BIC/AICc likelihood formulas, ambiguity, count caps and incomplete searches.
+- The analytic Gaussian Jacobian is independently checked by central finite differences, with and without weighting.
+- The saved-output checker independently recomputes selected Gaussian log-likelihood scores from exported observations/errors and detects changed artifacts.
+- Headerless CSV/XLSX preserve the first numeric row; explicit baseline-only interpolation supports irregular axes without resampling fitted observations.
+- A synthetic crossing batch fits and tracks both branches automatically without generator-supplied peak seeds.
+- Local measured checks exercise 12 pressure workbooks / 184 distinct real spectra, all in full-axis and declared-window runs, plus 36 prespecified spectra at two alternative baseline lambdas.
+- Direct raw-column checks: 368 / 368; 12 source workbook hashes unchanged; no dropped raw pairs.
+- Full-axis outcomes: 0 PASS, 184 INCONCLUSIVE. Declared-window outcomes: 6 PASS, 178 INCONCLUSIVE. No BLOCKED inputs.
+- Best-count sensitivity: 94/184 across window choices and 23/36 across baseline lambdas. Physical peak-count accuracy is **NOT_ASSESSED** without independent labels.
+- Current source exactly replayed three selected measured records, including a configured PASS and two INCONCLUSIVE cases. The full search traces, peak tables and RSS matched the saved results.
+- Chinese count-comparison pages, the local measured report and selected measured fit/residual plots were visually checked.
+
+[Detailed measured protocol and limits](real-validation.zh-CN.md) · [Aggregate JSON](measured-validation-summary.json).
+These are local real-data observations, not a claim that public CI accessed private measurements.
+Build/install evidence and platform results should be checked for the actual published commit in [Actions](https://github.com/Harihi86/raman-spectroscopy-analysis/actions/workflows/ci.yml).
+
+The version 0.2 record below is retained as historical evidence; its counts and limitations do not describe the new measured-data checks.
+
+# Historical version 0.2 validation
+
 Date: 2026-10-23. Version: 0.2.0. Local host: macOS arm64, CPython 3.12.0.
 This page records executed checks, with synthetic validation kept separate from measured-spectrum evidence.
 
@@ -48,8 +73,7 @@ alone does not establish a pass for later changes.
 
 ## Scientific limits and retained history
 
-Original measurement datasets and full legacy experiment pipelines remain
-**NOT_RUN**. No measured-spectrum validation or universal peak-identity accuracy
+At the version 0.2 milestone, original measurement datasets and full legacy experiment pipelines were **NOT_RUN**. No measured-spectrum validation or universal peak-identity accuracy
 is claimed. The retained legacy AsLS routine is differentially checked on a
 nonflat synthetic fixture; this is narrower than validating the full old workflow.
 

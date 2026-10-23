@@ -4,7 +4,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [中文使用指南](docs/usage.zh-CN.md)
 
-**Version 0.2** — a reproducible command-line tool for individual Raman spectra,
+**Version 0.3** — a reproducible command-line tool for individual Raman spectra,
 manifest-based batches and peak tracking across pressure acquisitions. It extends
 the owner-authored SHproject source with configurable, independently tested APIs.
 No experiment profile, fixed pressure table or sample-specific window is imported
@@ -12,8 +12,9 @@ by the supported pipeline.
 
 ## What you can do
 
-- Read explicit columns from CSV, TSV, delimited TXT and XLSX; keep original inputs intact.
-- Estimate an AsLS or reference-region polynomial baseline and fit 1–8 Gaussian peaks.
+- Read explicit columns, with a declared header row or headerless mode, from CSV, TSV, delimited TXT and XLSX; keep original inputs intact.
+- Estimate an AsLS or reference-region polynomial baseline; fit explicit Gaussians or compare automatic 0–N component models.
+- Propose seeds from the signal, compare BIC/AICc, and keep count ambiguity and model inadequacy visible.
 - Process spectra with shared defaults and per-spectrum overrides; save each failure independently.
 - Track accepted fitted peaks within independently named series, in acquisition order.
 - Preserve repeated/decreasing pressures, missing metadata, peak births/disappearances and gaps.
@@ -22,7 +23,7 @@ by the supported pipeline.
 - Recompute tracking settings from saved fits without rerunning the spectral optimizer.
 - Use Chinese help and console output; CSV summaries include a UTF-8 BOM for spreadsheet compatibility.
 
-The public examples are **synthetic**. Track IDs are algorithmic continuity
+The public examples are **synthetic**. Local applicability checks also use real pressure spectra from the owner's SHproject; raw measurements and private profiles remain outside this repository. See [measured-spectrum scope](docs/real-validation.zh-CN.md). Track IDs are algorithmic continuity
 labels, not chemical or vibrational-mode identifications.
 
 ## Install
@@ -64,6 +65,20 @@ benchmark of blind peak discovery.
 
 ![Generated synthetic pressure trajectories](docs/crossing-tracks.png)
 
+## Automatic peak proposals and count comparison
+
+```bash
+raman-analyze demo-batch --automatic --scenario crossing --output runs/automatic
+raman-analyze batch examples/automatic/manifest.json --output runs/auto-manifest
+```
+
+Use `"fit": {"auto": {"max_peaks": 5, "criterion": "bic"}}` instead of `fit.peaks`.
+The fitter compares a zero-peak linear background and 1–N Gaussian models on the same original samples.
+`model-selection.json`/`.csv` preserve candidate scores, competing counts and search diagnostics.
+BIC/AICc margins are conditional rankings, not count probabilities. A count at the search cap or a poor/ambiguous fit remains INCONCLUSIVE.
+Local measured-data checks exposed substantial limits: only 6/184 spectra passed configured diagnostics in declared windows, and 23/36 prespecified spectra changed their best count across baseline choices. These are applicability checks, not an independently labelled count-accuracy benchmark.
+See [automatic method](docs/automatic.md) and [中文自动选峰指南](docs/automatic.zh-CN.md).
+
 ## Analyze your own batch
 
 A complete [portable synthetic batch](examples/batch) includes its manifest, CSV inputs and truth table.
@@ -95,7 +110,7 @@ pressure/series metadata. Paths resolve relative to the manifest file.
 
 These numerical seeds and tracking thresholds are illustrative. Choose them for
 the actual data and resolution. A peak model is an explicit scientific input;
-the program does not select every material's lineshape or peak count automatically.
+automatic mode can select a candidate component count, while lineshape, baseline and physical interpretation remain explicit assumptions.
 
 ```bash
 raman-analyze validate manifest.json --check-files
@@ -139,7 +154,7 @@ raman-analyze demo --output runs/single-example
 raman-analyze run examples/synthetic/config.json --output runs/single-fit
 ```
 
-AsLS requires approximately uniform sampling. Fits use positive Gaussians with a
+AsLS requires approximately uniform sampling by default; `resample: true` explicitly interpolates only the baseline-estimation grid and maps the estimated baseline back to the original samples. Fits use positive Gaussians with a
 linear residual background. Covariance, FWHM and area errors are local estimates
 conditional on a fixed baseline and selected model. Baseline/calibration/model
 uncertainty is not included. Failed or unidentifiable fits do not update tracks.
@@ -160,10 +175,7 @@ partial batches, interruption records, retracking, independent series, crossings
 missing/duplicate pressures and an exhaustive small assignment oracle. CI runs on
 Linux/Windows with Python 3.11/3.12. [Observed validation](docs/validation.md).
 
-Current scope: explicit Gaussian models, header-based tabular inputs and local
-serial batches of up to 10,000 entries. Non-Gaussian models, automatic peak/model
-selection, calibrated tracking probabilities, bootstrap uncertainty, instrument
-formats and authorized measured-spectrum validation remain future work.
+Current scope: manual/automatic Gaussian components, explicit tabular imports and local serial batches of up to 10,000 entries. Non-Gaussian models, calibrated tracking probabilities, bootstrap uncertainty, instrument-native formats and independent measured peak-count labels remain future work.
 
 ## Source, roadmap and references
 

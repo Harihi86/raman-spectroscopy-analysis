@@ -4,13 +4,13 @@
 
 [English](README.md) · **简体中文** · [详细使用指南](docs/usage.zh-CN.md) · [常见问题](docs/troubleshooting.zh-CN.md)
 
-**当前版本：0.2。** 这是可在本地运行的 Raman 单谱分析、批处理和跨压力峰追踪工具。
+**当前版本：0.3。** 这是可在本地运行的 Raman 单谱分析、批处理和跨压力峰追踪工具。
 它在 SHproject 的基础上保留原始处理源码，建立独立、可配置的新接口。新接口使用用户提供的清单，不导入固定实验名称、压力表或材料窗口。
 
 ## 已实现的完整流程
 
 1. 明确指定光谱文件、列名、单位和采集顺序。
-2. 对每条光谱独立进行基线估计和 Gaussian 峰拟合。
+2. 对每条光谱独立进行基线估计；可自动提出峰位初值、比较 0–N 个 Gaussian 组分，也可手动指定模型。
 3. 按独立序列追踪跨压力的峰位，保留重复压力、缺失帧、峰的出现及消失。
 4. 将成功、失败、歧义及缺失元数据分别记录。
 5. 生成中文/英文离线结果页面、汇总 CSV、逐谱数值结果、追踪图和可核验的 JSON 文件。
@@ -25,7 +25,7 @@
 macOS / Linux：
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install .
 raman-analyze --lang zh demo-batch --output runs/first-batch
@@ -54,11 +54,30 @@ raman-analyze --lang zh demo-batch --scenario crossing --output runs/crossing
 
 示例的初始峰参数由合成模型明确给出，用于检验分析和追踪流程；它不是自动发现未知峰的性能测试。
 
+## 自动选峰和峰数判断
+
+```bash
+raman-analyze --lang zh demo-batch --automatic --scenario crossing --output runs/auto-crossing
+raman-analyze --lang zh batch examples/automatic/manifest.json --output runs/auto-example
+```
+
+真实数据清单中的拟合配置可以直接写：
+
+```json
+{"fit": {"auto": {"max_peaks": 5, "criterion": "bic", "delta_threshold": 6}}}
+```
+
+程序比较零峰与不同 Gaussian 组分数，保留近似等价的峰数候选。达到上限、搜索失败、残差不合适或组分无法辨识时，结果会标为 INCONCLUSIVE。
+“最佳候选”是当前基线、窗口和线型下的统计排序，不是已确认的物理峰数。
+本轮真实谱检查中，声明窗口内仅 6/184 条通过配置诊断；预选基线对照中 23/36 条的最佳峰数改变。因此当前实测结果需要复核。
+
+[自动选峰完整说明](docs/automatic.zh-CN.md) · [真实光谱本地验证](docs/real-validation.zh-CN.md)
+
 ## 换成自己的数据
 
 仓库还提供[可直接运行的合成批处理目录](examples/batch)，包含完整清单、CSV 和独立真值。
 
-准备带表头的 CSV、TSV、分隔文本 TXT 或 XLSX。使用 JSON 清单记录：
+支持 CSV、TSV、分隔文本 TXT 和 XLSX。有表头时使用列名；无表头时显式设置 `header: null` 并使用列索引。使用 JSON 清单记录：
 
 - `id`：稳定的光谱 ID，使用字母、数字、短横线或下划线，且不重复。
 - `label`：可选的显示名称，可以写中文。
@@ -87,6 +106,7 @@ raman-analyze --lang zh batch manifest.json --output runs/my-batch
 | `spectra/<id>/processed.csv` | 读取的原始强度、估计基线及校正后强度 |
 | `spectra/<id>/peaks.csv` | 峰位、FWHM、面积和局部误差 |
 | `spectra/<id>/fit.csv` | 拟合曲线、Gaussian 分量与残差 |
+| `spectra/<id>/model-selection.html`、`.json`、`.csv` | 自动模式的峰数比较、竞争模型、拟合初值及诊断 |
 | `tracking/assignments.csv` | 配对、歧义、排除结果和缺口的完整表 |
 | `tracking/tracks.csv` | 每条算法轨迹的摘要 |
 | `tracking/series-*.png`、`.pdf` | 各独立序列的压力轨迹图 |
@@ -132,11 +152,13 @@ raman-analyze --lang zh track runs/my-batch/batch-report.json --settings trackin
 
 ## 当前适用范围
 
-已实现的峰模型为 1–8 个正 Gaussian 峰与线性残余背景；峰数和初值需要明确指定。
-单条谱的局部协方差不包含基线估计、校准和模型选择误差。AsLS 假定近似均匀采样和正峰。
+手动模式支持 1–8 个正 Gaussian 峰；自动模式从零峰线性背景到用户配置的最大组分数进行比较，默认上限 5。峰位初值由信号提出，无需手工填入。
+单条谱的局部协方差不包含基线估计、校准和模型选择误差。AsLS 默认要求近似均匀采样；可显式设置 `resample: true`，只在基线估计时使用均匀网格，拟合仍使用原始采样点。
 追踪中的线性预测与代价阈值是可检查的启发式规则，不是经过校准的身份概率。
 
-非 Gaussian 线型、自动选峰/选模型、仪器原生格式、自动中断续跑和真实实验参考谱验证仍在后续计划中。
+已对 SHproject 的真实压力光谱开展本地验证，完整记录成功和不确定结果，见[实测验证说明](docs/real-validation.zh-CN.md)。这不等于已经用独立标注证明物理峰数正确。
+
+非 Gaussian 线型、仪器原生格式、自动中断续跑和有独立峰数标注的实验参考验证仍在后续计划中。
 它们没有被列为已经完成。历史 SHproject 的完整实验流程仍处于单独的兼容性与科学验证范围。
 
 ## 测试与开发

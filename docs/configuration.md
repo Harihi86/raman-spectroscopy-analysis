@@ -25,8 +25,8 @@ The runtime uses JSON Schema Draft 2020-12 and rejects unknown fields and nonfin
 
 When the baseline method changes, the replacement baseline object is used in full.
 When the method stays the same, explicitly specified fields are merged. Each
-spectrum requires a resolved `fit.peaks` list. Input columns may be names or
-nonnegative zero-based indices; a header row is required.
+spectrum requires exactly one resolved `fit.peaks` list or `fit.auto` object. Switching these modes removes the previous mode settings. Input columns may be names or
+nonnegative zero-based indices; `header` defaults to row 0; `header: null` preserves a headerless numeric first row and requires integer column indices.
 
 `batch-report.json` uses `format=raman-analysis-batch`, `schema_version=1`, a program
 version and a lifecycle state. It contains per-spectrum outcomes, fit peaks,
@@ -50,3 +50,5 @@ completed results requiring review, 2 for invalid configuration/execution input,
 and 130 for an interrupted operation. All JSON and HTML use UTF-8; tabular batch
 summaries use UTF-8 with BOM. Runtime reports can contain user data and local
 paths in error diagnostics; review them before sharing.
+
+Automatic settings and count-score formulas are documented in [automatic.md](automatic.md). AsLS `resample: true` explicitly supports irregular axes by estimating only the baseline on a same-length uniform grid; the fit uses the original samples.

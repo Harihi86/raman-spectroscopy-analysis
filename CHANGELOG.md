@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 — 2026-10-23
+
+- Added signal-derived Gaussian seeds, zero-to-N count comparison, BIC/AICc tables, deterministic multi-start search and explicit count ambiguity/limits.
+- Added `demo-batch --automatic` and an automatic manifest with no generator-supplied peak parameters.
+- Added explicit headerless input and opt-in baseline-only interpolation for irregular sampling.
+- Added an analytic fitting Jacobian checked against independent central finite differences.
+- Exercised the new API on locally authorized real pressure workbooks, with full-axis/windowed comparisons and baseline sensitivity; measured physical peak-count accuracy remains unassessed without independent labels.
+- Updated Chinese/English automatic-selection guidance, outputs and measured-data evidence boundaries.
+
 ## 0.2.0 — 2026-10-23
 
 - Added versioned, schema-validated batch manifests with shared defaults and per-acquisition overrides.

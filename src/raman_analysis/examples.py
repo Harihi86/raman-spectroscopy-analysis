@@ -9,7 +9,7 @@ from .batch import analyze_batch, write_json
 from .fitting import gaussian
 
 
-def demo_batch(output: Path, *, scenario="basic", no_figures=False, progress=None):
+def demo_batch(output: Path, *, scenario="basic", automatic=False, no_figures=False, progress=None):
     if scenario not in {"basic", "crossing"}:
         raise ValueError("scenario must be basic or crossing")
     output = Path(output)
@@ -89,6 +89,13 @@ def demo_batch(output: Path, *, scenario="basic", no_figures=False, progress=Non
         },
         "spectra": spectra,
     }
+    if automatic:
+        manifest["defaults"]["fit"] = {"auto": {"max_peaks": 4}}
+        manifest["metadata"]["fit_initialization"] = (
+            "automatic proposals; generated peak parameters are not supplied to the fitter"
+        )
+        for spectrum in spectra:
+            spectrum.pop("analysis")
     write_json(output / "manifest.json", manifest)
     write_json(output / "truth.json", {"data_kind": "synthetic", "spectra": truth})
     return analyze_batch(

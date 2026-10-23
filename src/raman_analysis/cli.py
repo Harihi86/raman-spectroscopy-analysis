@@ -102,6 +102,11 @@ def main(argv=None):
         "demo-batch", help=text("Run synthetic pressure-series examples", "运行合成压力序列示例")
     )
     demonstration.add_argument(
+        "--automatic",
+        action="store_true",
+        help=text("Select peak seeds and counts from the signal", "从信号自动选峰和判断峰数"),
+    )
+    demonstration.add_argument(
         "--scenario",
         choices=["basic", "crossing"],
         default="basic",
@@ -153,7 +158,11 @@ def main(argv=None):
             report = demo(args.output)
         elif args.operation == "demo-batch":
             report = demo_batch(
-                args.output, scenario=args.scenario, no_figures=args.no_figures, progress=progress
+                args.output,
+                scenario=args.scenario,
+                automatic=args.automatic,
+                no_figures=args.no_figures,
+                progress=progress,
             )
         elif args.operation == "batch":
             report = analyze_batch(

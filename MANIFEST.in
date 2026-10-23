@@ -3,3 +3,4 @@ recursive-include docs *.md *.json *.svg *.png
 recursive-include examples *.md *.json *.csv
 recursive-include legacy *.py *.txt *.md *.json
 recursive-include src/raman_analysis/schemas *.json
+recursive-include tools *.py

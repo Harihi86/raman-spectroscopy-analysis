@@ -13,10 +13,21 @@ def estimate_baseline(x, y, config):
             raise ValueError("none baseline takes no parameters")
         return np.zeros_like(y)
     if method == "asls":
-        if set(config) - {"lam", "p", "iterations"}:
+        if set(config) - {"lam", "p", "iterations", "resample"}:
             raise ValueError("Unknown AsLS parameter")
+        resample = config.pop("resample", False)
+        if type(resample) is not bool:
+            raise ValueError("AsLS resample must be true or false")
         spacing = np.diff(x)
         if not np.allclose(spacing, np.median(spacing), rtol=1e-3, atol=1e-9):
+            if resample:
+                # Only the baseline estimator uses this explicit interpolation;
+                # original spectral samples still enter every fit and export.
+                grid = np.linspace(x[0], x[-1], len(x))
+                baseline = estimate_baseline(
+                    grid, np.interp(grid, x, y), {"method": "asls", **config}
+                )
+                return np.interp(x, grid, baseline)
             raise ValueError("AsLS uses an index-space penalty and requires uniform sampling")
         lam, p, iterations = (
             config.get("lam", 1e6),

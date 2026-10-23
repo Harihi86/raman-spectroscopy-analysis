@@ -39,8 +39,7 @@ assignment, calibrated uncertainty, phase transition, chemical identification or
 experimental reproducibility across instruments.
 
 Synthetic tests exercise known peaks across multiple counts and axis windows.
-Coverage of measured high-pressure spectra remains a separate future validation
-step requiring releasable calibration/reference data.
+Local measured pressure spectra have now been exercised with full outcome and sensitivity reporting; see [measured-data evidence](real-validation.zh-CN.md). Physical count accuracy still requires independent reference labels.
 
 
 Residual adequacy is reported separately from optimizer convergence. A lag-1
@@ -57,4 +56,6 @@ lambda=1e9 for its uniform synthetic grid. This parameter is not a universal
 recommendation. Its saved truth, residual plots and report expose remaining
 baseline/model bias instead of treating convergence as physical validation.
 
-Flat or affine spectra, within a relative intensity tolerance of 1e-12, do not establish a Gaussian peak. Their covariance is withheld and the result stays INCONCLUSIVE regardless of a platform-specific numerical Jacobian rank. The report records this criterion explicitly.
+In manual positive-peak mode, flat or affine spectra within a relative intensity tolerance of 1e-12 do not establish a Gaussian peak: peak covariance is withheld and the result stays INCONCLUSIVE. Automatic mode explicitly includes a zero-peak background and can select it without asserting that a physical mode is absent. See [automatic model comparison](automatic.md).
+
+An explicit AsLS `resample:true` option estimates only the baseline on a same-length uniform grid for irregular inputs; fitted observations stay on their original axes. The additional baseline uncertainty is not included in the local covariance. When supplied, fitted-sample standard errors are exported as `measurement_sigma` in `fit.csv`.

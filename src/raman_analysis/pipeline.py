@@ -12,9 +12,11 @@ import numpy as np
 import pandas as pd
 
 from . import __version__
+from .automatic import auto_fit
 from .baseline import estimate_baseline
 from .fitting import fit_peaks
 from .io import load_spectrum
+from .report import selection_html
 
 
 def analyze(config, output: Path, *, base: Path = Path("."), save_figures: bool = True):
@@ -34,7 +36,10 @@ def analyze(config, output: Path, *, base: Path = Path("."), save_figures: bool 
     if len(window) != 2 or not np.isfinite(window).all() or window[0] >= window[1]:
         raise ValueError("Fit window must be a finite increasing interval")
     selection = (spectrum.x >= window[0]) & (spectrum.x <= window[1])
-    fit = fit_peaks(
+    if ("peaks" in fit_config) == ("auto" in fit_config):
+        raise ValueError("Provide exactly one of fit.peaks or fit.auto")
+    fit_function = auto_fit if "auto" in fit_config else fit_peaks
+    fit = fit_function(
         spectrum.x[selection],
         corrected[selection],
         errors=spectrum.sigma[selection] if spectrum.sigma is not None else None,
@@ -68,7 +73,23 @@ def analyze(config, output: Path, *, base: Path = Path("."), save_figures: bool 
     (output / "configuration.json").write_text(
         json.dumps(config, indent=2, allow_nan=False) + "\n", encoding="utf-8"
     )
-    pd.DataFrame(fit["peaks"]).to_csv(output / "peaks.csv", index=False)
+    pd.DataFrame(
+        fit["peaks"],
+        columns=list(fit["peaks"][0])
+        if fit["peaks"]
+        else ["center_cm1", "fwhm_cm1", "amplitude", "area"],
+    ).to_csv(output / "peaks.csv", index=False)
+    if "model_selection" in fit:
+        model_selection = fit["model_selection"]
+        (output / "model-selection.html").write_text(
+            selection_html(model_selection, fit["status"], fit["diagnostics"]), encoding="utf-8"
+        )
+        (output / "model-selection.json").write_text(
+            json.dumps(model_selection, indent=2, allow_nan=False) + "\n", encoding="utf-8"
+        )
+        pd.DataFrame(
+            [{k: v for k, v in c.items() if k != "attempts"} for c in model_selection["candidates"]]
+        ).to_csv(output / "model-selection.csv", index=False, encoding="utf-8-sig")
     pd.DataFrame(
         {
             "shift_cm1": spectrum.x,
@@ -83,6 +104,8 @@ def analyze(config, output: Path, *, base: Path = Path("."), save_figures: bool 
         "residual": fit["residuals"],
         "residual_background": fit["residual_background"],
     }
+    if spectrum.sigma is not None:
+        fit_frame["measurement_sigma"] = spectrum.sigma[selection]
     for i, component in enumerate(fit["components"]):
         fit_frame[f"gaussian_{i + 1}"] = component
     pd.DataFrame(fit_frame).to_csv(output / "fit.csv", index=False)
@@ -130,8 +153,9 @@ def plot_spectrum(spectrum, baseline, corrected, selection, fit, data_kind, outp
         ax.set_ylabel("Intensity (a.u.)")
     axes[2].set_ylabel("Residual (a.u.)")
     axes[2].set_xlabel(r"Raman shift (cm$^{-1}$)")
+    decision = "AUTO" if "model_selection" in fit else "MANUAL"
     fig.suptitle(
-        f"{data_kind.upper()} spectrum | {len(fit['peaks'])} Gaussian peaks | {fit['status']}",
+        f"{data_kind.upper()} | {decision} | {len(fit['peaks'])} Gaussian peaks | {fit['status']}",
         fontsize=12,
     )
     fig.savefig(output / "spectrum.png", dpi=180)

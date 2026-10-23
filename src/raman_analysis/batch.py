@@ -184,6 +184,18 @@ def analyze_batch(manifest_path: Path, output: Path, *, no_figures=False, progre
                         diagnostics=report["diagnostics"],
                         provenance=report["provenance"],
                     )
+                    if "model_selection" in report:
+                        decision = report["model_selection"]
+                        record["model_selection"] = {
+                            k: decision[k]
+                            for k in (
+                                "criterion",
+                                "selected_peak_count",
+                                "plausible_peak_counts",
+                                "count_status",
+                                "search_complete",
+                            )
+                        }
                 except (ValueError, KeyError, TypeError, OSError, IndexError) as exc:
                     # One bad input is retained as BLOCKED, without discarding other spectra.
                     record.update(
@@ -216,10 +228,23 @@ def analyze_batch(manifest_path: Path, output: Path, *, no_figures=False, progre
             "pressure_gpa",
             "status",
             "peak_count",
+            "count_status",
+            "plausible_peak_counts",
             "output",
         ]
         pd.DataFrame(
-            [{**r, "peak_count": len(r["peaks"])} for r in records], columns=columns
+            [
+                {
+                    **r,
+                    "peak_count": len(r["peaks"]),
+                    "count_status": r.get("model_selection", {}).get("count_status", "MANUAL"),
+                    "plausible_peak_counts": json.dumps(
+                        r.get("model_selection", {}).get("plausible_peak_counts", [])
+                    ),
+                }
+                for r in records
+            ],
+            columns=columns,
         ).to_csv(output / "summary.csv", index=False, encoding="utf-8-sig")
         state.update(
             state="COMPLETE",

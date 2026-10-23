@@ -6,6 +6,7 @@ from importlib.resources import files
 
 from jsonschema import Draft202012Validator
 
+from .automatic import AutoSettings
 from .tracking import TrackingSettings
 
 
@@ -28,6 +29,11 @@ def merge_settings(defaults, overrides):
             if name == "baseline" and value.get("method") != result[name].get("method"):
                 result[name] = copy.deepcopy(value)
             else:
+                if name == "fit":
+                    if "auto" in value and "peaks" not in value:
+                        result[name].pop("peaks", None)
+                    elif "peaks" in value and "auto" not in value:
+                        result[name].pop("auto", None)
                 result[name] = merge_settings(result[name], value)
         else:
             result[name] = copy.deepcopy(value)
@@ -61,8 +67,12 @@ def validate_manifest(manifest) -> list[dict]:
         analysis["metadata"] = merge_settings(
             analysis.get("metadata", {}), entry.get("metadata", {})
         )
-        if "fit" not in analysis or "peaks" not in analysis["fit"]:
-            raise ValueError(f"Spectrum {spectrum_id}: provide fit.peaks in defaults or analysis")
+        if "fit" not in analysis or ("peaks" in analysis["fit"]) == ("auto" in analysis["fit"]):
+            raise ValueError(
+                f"Spectrum {spectrum_id}: provide exactly one of fit.peaks or fit.auto"
+            )
+        if "auto" in analysis["fit"]:
+            AutoSettings(**analysis["fit"]["auto"])
         resolved_schema = {**schema, "$ref": "#/$defs/analysis"}
         # Remove root-only constraints; retain local references for validation.
         resolved_schema = {

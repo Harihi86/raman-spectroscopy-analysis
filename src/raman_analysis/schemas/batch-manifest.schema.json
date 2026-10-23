@@ -127,6 +127,17 @@
         },
         "units": {
           "const": "cm^-1"
+        },
+        "header": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       }
     },
@@ -199,7 +210,16 @@
               "type": "null"
             }
           ]
+        },
+        "auto": {
+          "$ref": "#/$defs/automatic"
         }
+      },
+      "not": {
+        "required": [
+          "auto",
+          "peaks"
+        ]
       }
     },
     "peak": {
@@ -275,6 +295,9 @@
               "type": "integer",
               "minimum": 1,
               "maximum": 500
+            },
+            "resample": {
+              "type": "boolean"
             }
           }
         },
@@ -415,6 +438,73 @@
           "type": "number",
           "minimum": 0,
           "default": 0
+        }
+      }
+    },
+    "automatic": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_peaks": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "criterion": {
+          "enum": [
+            "bic",
+            "aicc"
+          ]
+        },
+        "delta_threshold": {
+          "type": "number",
+          "minimum": 0
+        },
+        "prominence_snr": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "smooth_sigma_points": {
+          "type": "number",
+          "minimum": 0
+        },
+        "multistarts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "min_sigma_cm1": {
+          "anyOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "max_sigma_cm1": {
+          "anyOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "min_separation_cm1": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       }
     }
