@@ -34,6 +34,8 @@
   "reduced_chi_square": 1.0735305721000452,
   "degrees_of_freedom": 993,
   "jacobian_rank": 8,
+  "input_is_affine_within_tolerance": false,
+  "affine_tolerance_relative": 1e-12,
   "jacobian_condition": 5062.548936166984,
   "covariance": [
     [

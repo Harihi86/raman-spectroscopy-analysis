@@ -154,9 +154,17 @@ def test_invalid_baseline_parameters_fail(bad):
         estimate_baseline(np.arange(20), np.ones(20), bad)
 
 
-def test_flat_spectrum_covariance_is_inconclusive():
+@pytest.mark.parametrize("level", [0, 1, -12, 1e8])
+def test_flat_spectrum_covariance_is_inconclusive(level):
     x = np.linspace(0, 100, 201)
-    result = fit_peaks(x, np.ones_like(x), [{"center": 50, "sigma": 10}])
+    result = fit_peaks(x, np.full_like(x, level), [{"center": 50, "sigma": 10}])
+    assert result["status"] == "INCONCLUSIVE"
+    assert result["covariance"] is None
+
+
+def test_affine_input_does_not_establish_a_peak():
+    x = np.linspace(0, 100, 201)
+    result = fit_peaks(x, 3 + x / 10, [{"center": 50, "sigma": 10}])
     assert result["status"] == "INCONCLUSIVE"
     assert result["covariance"] is None
 

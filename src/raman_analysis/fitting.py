@@ -32,6 +32,11 @@ def fit_peaks(x, y, peaks, *, errors=None, max_nfev=10000, residual_correlation_
             raise ValueError("Measurement errors must be positive and match the data")
     reference = float(np.mean(x))
     x0 = x - reference
+    # A numerical Jacobian can appear full rank at a vanishing peak on some
+    # BLAS/optimizer combinations. Exact affine input supplies no peak evidence.
+    affine = np.polynomial.Polynomial.fit(x0, y, 1)(x0)
+    intensity_scale = max(float(np.max(np.abs(y))), np.finfo(float).tiny)
+    no_peak_contrast = bool(np.max(np.abs(y - affine)) <= 1e-12 * intensity_scale)
     step, span = float(np.min(np.diff(x))), float(np.ptp(x))
     initial, lower, upper = [], [], []
     seeds = []
@@ -82,7 +87,12 @@ def fit_peaks(x, y, peaks, *, errors=None, max_nfev=10000, residual_correlation_
     residuals = y - fitted
     rank = int(np.linalg.matrix_rank(result.jac))
     condition = float(np.linalg.cond(result.jac))
-    identifiable = rank == len(initial) and np.isfinite(condition) and condition < 1e10
+    identifiable = (
+        rank == len(initial)
+        and np.isfinite(condition)
+        and condition < 1e10
+        and not no_peak_contrast
+    )
     dof = len(x) - len(initial)
     covariance = None
     if identifiable:
@@ -93,8 +103,10 @@ def fit_peaks(x, y, peaks, *, errors=None, max_nfev=10000, residual_correlation_
     diagnostics = []
     if not result.success:
         diagnostics.append("optimizer did not converge")
-    if not identifiable:
+    if rank != len(initial) or not np.isfinite(condition) or condition >= 1e10:
         diagnostics.append("local covariance is rank deficient or poorly conditioned")
+    if no_peak_contrast:
+        diagnostics.append("flat or affine input contains no identifiable Gaussian peak")
     if np.any(result.active_mask):
         diagnostics.append("one or more fit parameters lie on a bound")
     residual_rmse = float(np.sqrt(np.mean(residuals**2)))
@@ -153,6 +165,8 @@ def fit_peaks(x, y, peaks, *, errors=None, max_nfev=10000, residual_correlation_
         "reduced_chi_square": reduced_chi_square,
         "degrees_of_freedom": dof,
         "jacobian_rank": rank,
+        "input_is_affine_within_tolerance": no_peak_contrast,
+        "affine_tolerance_relative": 1e-12,
         "jacobian_condition": condition if np.isfinite(condition) else None,
         "covariance": covariance.tolist() if covariance is not None else None,
         "covariance_parameter_order": "input peak order: amplitude, center, sigma; background intercept, slope",

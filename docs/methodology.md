@@ -56,3 +56,5 @@ correlated residuals and width bias. The released example explicitly uses
 lambda=1e9 for its uniform synthetic grid. This parameter is not a universal
 recommendation. Its saved truth, residual plots and report expose remaining
 baseline/model bias instead of treating convergence as physical validation.
+
+Flat or affine spectra, within a relative intensity tolerance of 1e-12, do not establish a Gaussian peak. Their covariance is withheld and the result stays INCONCLUSIVE regardless of a platform-specific numerical Jacobian rank. The report records this criterion explicitly.
