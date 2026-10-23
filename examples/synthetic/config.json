@@ -1,0 +1,29 @@
+{
+  "data_kind": "synthetic",
+  "input": {
+    "path": "synthetic.csv",
+    "sigma": "noise_sd"
+  },
+  "baseline": {
+    "method": "asls",
+    "lam": 1000000000.0,
+    "p": 0.01,
+    "iterations": 30
+  },
+  "fit": {
+    "peaks": [
+      {
+        "center": 340,
+        "sigma": 20
+      },
+      {
+        "center": 710,
+        "sigma": 30
+      }
+    ]
+  },
+  "metadata": {
+    "seed": 20261023,
+    "purpose": "software demonstration; no experimental observations"
+  }
+}

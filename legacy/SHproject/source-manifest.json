@@ -1,0 +1,42 @@
+{
+  "included": [
+    {
+      "file": "core_processing.py",
+      "sha256": "6a5a3f0f6ca3967aae7417726c4c12ab281f198beb66267b58900ce4d57bd8f8",
+      "treatment": "unmodified source"
+    },
+    {
+      "file": "photoactivity_processing.py",
+      "sha256": "bc24028f13ae11af853f34941ac9c22cba0ed4009cee335463abbf7517543fcb",
+      "treatment": "unmodified source"
+    },
+    {
+      "file": "run_pipeline.py",
+      "sha256": "9f0d88abd5830bde385ef6f0ad5c4bbf36ef10db151063ee32241db52139f3f0",
+      "treatment": "unmodified source"
+    },
+    {
+      "file": "run_photoactivity.py",
+      "sha256": "8ec6fbbbf37257b29e3a1eb54257ec8700a43d39d069e257f67ec5bca3a8a7e3",
+      "treatment": "unmodified source"
+    },
+    {
+      "file": "requirements.txt",
+      "sha256": "4dcb4e69078cb7f5a185eb1bb891e8acf1a5afa3114c8e9c3f58fd44083862e1",
+      "treatment": "unmodified source"
+    }
+  ],
+  "modified": [
+    "profiles.py: generic template only",
+    "photoactivity_profiles.py: empty public template"
+  ],
+  "excluded": [
+    "data/",
+    "data.zip",
+    "code.zip",
+    "outputs/",
+    "__pycache__/",
+    ".DS_Store",
+    "README_upgrade.txt: experiment-specific commands"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "kind": "synthetic",
+  "centers_cm1": [
+    350,
+    720
+  ],
+  "sigma_cm1": [
+    22,
+    35
+  ],
+  "amplitudes": [
+    18,
+    12
+  ],
+  "noise_sd": 0.15
+}
